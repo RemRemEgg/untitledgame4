@@ -1,0 +1,200 @@
+[gd_scene load_steps=12 format=3 uid="uid://bswu5ecv41c3d"]
+
+[ext_resource type="Script" uid="uid://c7y4ftog1i33k" path="res://data/game/gamerunner.gd" id="1_6guqb"]
+[ext_resource type="PackedScene" uid="uid://ccn2p7ejk1lh2" path="res://data/ui/hud.tscn" id="2_oa86o"]
+[ext_resource type="Material" uid="uid://d0mfmmsdfp221" path="res://assets/shaders/barrier.tres" id="4_pc6ge"]
+[ext_resource type="Material" uid="uid://cw70lnbkyw168" path="res://assets/shaders/grid.res" id="5_e8kgx"]
+[ext_resource type="Material" uid="uid://qde851w0coic" path="res://assets/shaders/temp_ground.tres" id="6_42o02"]
+[ext_resource type="Script" uid="uid://c4ojj7hck0sxg" path="res://data/game/camera.gd" id="7_0mhq4"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_3pd7d"]
+custom_solver_bias = 1.0
+normal = Vector2(0, 1)
+distance = -160.0
+
+[sub_resource type="Environment" id="Environment_p1tdy"]
+glow_levels/1 = 0.1
+glow_levels/2 = 0.2
+glow_levels/3 = 0.15
+glow_levels/4 = 0.1
+glow_levels/5 = 0.0
+glow_intensity = 2.0
+glow_strength = 2.0
+glow_mix = 0.15
+glow_blend_mode = 1
+glow_hdr_threshold = 4.0
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_0s54a"]
+viewport_path = NodePath("vp/sub_vp")
+
+[sub_resource type="TorusMesh" id="TorusMesh_kvoni"]
+rings = 16
+ring_segments = 8
+
+[sub_resource type="SphereMesh" id="SphereMesh_n6n52"]
+
+[node name="gamerunner" type="Node"]
+script = ExtResource("1_6guqb")
+
+[node name="hud" parent="." instance=ExtResource("2_oa86o")]
+layer = 128
+
+[node name="vp" type="SubViewportContainer" parent="."]
+process_mode = 3
+light_mask = 0
+visibility_layer = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+stretch = true
+
+[node name="sub_vp" type="SubViewport" parent="vp"]
+disable_3d = true
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(1152, 648)
+render_target_update_mode = 4
+
+[node name="world_2d" type="Node2D" parent="vp/sub_vp"]
+
+[node name="entities" type="Node2D" parent="vp/sub_vp/world_2d"]
+
+[node name="projectiles" type="Node2D" parent="vp/sub_vp/world_2d"]
+
+[node name="bounds" type="StaticBody2D" parent="vp/sub_vp/world_2d"]
+scale = Vector2(8, 8)
+
+[node name="n" type="CollisionShape2D" parent="vp/sub_vp/world_2d/bounds"]
+shape = SubResource("WorldBoundaryShape2D_3pd7d")
+
+[node name="ne" type="CollisionShape2D" parent="vp/sub_vp/world_2d/bounds"]
+rotation = 1.0472
+shape = SubResource("WorldBoundaryShape2D_3pd7d")
+
+[node name="se" type="CollisionShape2D" parent="vp/sub_vp/world_2d/bounds"]
+rotation = 2.0944
+shape = SubResource("WorldBoundaryShape2D_3pd7d")
+
+[node name="s" type="CollisionShape2D" parent="vp/sub_vp/world_2d/bounds"]
+rotation = 3.14159
+shape = SubResource("WorldBoundaryShape2D_3pd7d")
+
+[node name="sw" type="CollisionShape2D" parent="vp/sub_vp/world_2d/bounds"]
+rotation = 4.18879
+shape = SubResource("WorldBoundaryShape2D_3pd7d")
+
+[node name="nw" type="CollisionShape2D" parent="vp/sub_vp/world_2d/bounds"]
+rotation = 5.23599
+shape = SubResource("WorldBoundaryShape2D_3pd7d")
+
+[node name="debug_camera" type="Camera2D" parent="vp/sub_vp"]
+
+[node name="world_control" type="Control" parent="vp/sub_vp"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="popups" type="Control" parent="vp/sub_vp/world_control"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="world_3d" type="Node3D" parent="."]
+top_level = true
+
+[node name="camera" type="Camera3D" parent="world_3d"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 1, 1, 1)
+environment = SubResource("Environment_p1tdy")
+current = true
+fov = 100.0
+script = ExtResource("7_0mhq4")
+
+[node name="debug_draw" type="Sprite3D" parent="world_3d/camera"]
+transform = Transform3D(0.208, 0, 0, 0, -9.09197e-09, -0.208, 0, 0.208, -9.09197e-09, 0, 0, -1)
+pixel_size = 1.0
+axis = 1
+double_sided = false
+no_depth_test = true
+texture = SubResource("ViewportTexture_0s54a")
+
+[node name="static_render" type="Node3D" parent="world_3d"]
+
+[node name="light_main" type="DirectionalLight3D" parent="world_3d/static_render"]
+transform = Transform3D(-0.926938, -0.295371, 0.231391, 0.0832039, 0.439527, 0.894368, -0.365873, 0.848276, -0.382838, 0, 0, 0)
+rotation_edit_mode = 2
+light_color = Color(1, 0.881392, 0.798985, 1)
+light_energy = 0.9
+shadow_enabled = true
+
+[node name="light_contrast" type="DirectionalLight3D" parent="world_3d/static_render"]
+transform = Transform3D(-0.0119407, 0.189845, -0.981741, -0.739076, 0.659637, 0.136547, 0.673516, 0.727212, 0.132434, 0, 0, 0)
+light_color = Color(0.5992, 0.704718, 0.985124, 1)
+light_energy = 0.6
+
+[node name="light_mild" type="DirectionalLight3D" parent="world_3d/static_render"]
+transform = Transform3D(0.994135, -0.0111086, -0.10757, 0.105374, -0.124127, 0.986655, -0.0243128, -0.992204, -0.122229, 0, 0, 0)
+light_color = Color(0.787522, 0.983074, 0.956049, 1)
+light_energy = 0.1
+shadow_blur = 1.2
+
+[node name="barriers" type="Node3D" parent="world_3d/static_render"]
+transform = Transform3D(1280, 0, 0, 0, 1280, 0, 0, 0, 1280, 0, -125, 0)
+
+[node name="n" type="CSGPolygon3D" parent="world_3d/static_render/barriers"]
+transform = Transform3D(0.096225, 0, 0, 0, -4.20613e-09, -0.000833333, 0, 0.096225, -3.64262e-11, 0, 7.28501e-09, -0.166662)
+polygon = PackedVector2Array(1, 0, 0.5, 0.866, -0.5, 0.866, -1, 0, -0.5, -0.866, 0.5, -0.866)
+depth = 256.0
+material = ExtResource("4_pc6ge")
+
+[node name="ne" type="CSGPolygon3D" parent="world_3d/static_render/barriers"]
+transform = Transform3D(0.096225, 0, 0, 0, -4.20613e-09, -0.000833333, 0, 0.096225, -3.64262e-11, 0.144337, 3.64251e-09, -0.0833308)
+polygon = PackedVector2Array(1, 0, 0.5, 0.866, -0.5, 0.866, -1, 0, -0.5, -0.866, 0.5, -0.866)
+depth = 256.0
+material = ExtResource("4_pc6ge")
+
+[node name="se" type="CSGPolygon3D" parent="world_3d/static_render/barriers"]
+transform = Transform3D(0.096225, 0, 0, 0, -4.20613e-09, -0.000833333, 0, 0.096225, -3.64262e-11, 0.144337, -3.64251e-09, 0.0833308)
+polygon = PackedVector2Array(1, 0, 0.5, 0.866, -0.5, 0.866, -1, 0, -0.5, -0.866, 0.5, -0.866)
+depth = 256.0
+material = ExtResource("4_pc6ge")
+
+[node name="s" type="CSGPolygon3D" parent="world_3d/static_render/barriers"]
+transform = Transform3D(0.096225, 0, 0, 0, -4.20613e-09, -0.000833333, 0, 0.096225, -3.64262e-11, 0, -7.28501e-09, 0.166662)
+polygon = PackedVector2Array(1, 0, 0.5, 0.866, -0.5, 0.866, -1, 0, -0.5, -0.866, 0.5, -0.866)
+depth = 256.0
+material = ExtResource("4_pc6ge")
+
+[node name="sw" type="CSGPolygon3D" parent="world_3d/static_render/barriers"]
+transform = Transform3D(0.096225, 0, 0, 0, -4.20613e-09, -0.000833333, 0, 0.096225, -3.64262e-11, -0.144337, -3.64251e-09, 0.0833308)
+polygon = PackedVector2Array(1, 0, 0.5, 0.866, -0.5, 0.866, -1, 0, -0.5, -0.866, 0.5, -0.866)
+depth = 256.0
+material = ExtResource("4_pc6ge")
+
+[node name="nw" type="CSGPolygon3D" parent="world_3d/static_render/barriers"]
+transform = Transform3D(0.096225, 0, 0, 0, -4.20613e-09, -0.000833333, 0, 0.096225, -3.64262e-11, -0.144337, 3.64251e-09, -0.0833308)
+polygon = PackedVector2Array(1, 0, 0.5, 0.866, -0.5, 0.866, -1, 0, -0.5, -0.866, 0.5, -0.866)
+depth = 256.0
+material = ExtResource("4_pc6ge")
+
+[node name="ground" type="MeshInstance3D" parent="world_3d/static_render"]
+transform = Transform3D(16, 0, 0, 0, 1, 0, 0, 0, 16, 0, -24, 0)
+material_override = ExtResource("6_42o02")
+gi_mode = 0
+
+[node name="render" type="Node3D" parent="world_3d"]
+
+[node name="dornut" type="MeshInstance3D" parent="world_3d/render"]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, -3, 0)
+material_override = ExtResource("5_e8kgx")
+mesh = SubResource("TorusMesh_kvoni")
+skeleton = NodePath("../../..")
+
+[node name="mesh_instance_3d" type="MeshInstance3D" parent="world_3d/render/dornut"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.69948)
+material_override = ExtResource("6_42o02")
+mesh = SubResource("SphereMesh_n6n52")

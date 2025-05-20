@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://ccn2p7ejk1lh2"]
+
+[ext_resource type="Script" path="res://data/ui/hud.gd" id="1_35wcr"]
+[ext_resource type="Theme" uid="uid://30k0orm342ib" path="res://data/ui/global.tres" id="1_jrrvv"]
+
+[node name="hud" type="CanvasLayer"]
+script = ExtResource("1_35wcr")
+
+[node name="margin_container" type="MarginContainer" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+theme = ExtResource("1_jrrvv")
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="fps" type="Label" parent="margin_container"]
+layout_mode = 2

@@ -1,0 +1,141 @@
+[gd_scene load_steps=3 format=3 uid="uid://dl1kfp6mi78sb"]
+
+[ext_resource type="Script" path="res://data/ui/hydra.gd" id="1_5uud0"]
+[ext_resource type="Theme" uid="uid://p45krgn8sxrr" path="res://data/ui/hydra.tres" id="2_koqqg"]
+
+[node name="hydra" type="CanvasLayer"]
+script = ExtResource("1_5uud0")
+
+[node name="neck" type="GridContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -106.0
+offset_top = -106.0
+offset_right = 106.0
+offset_bottom = 106.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+columns = 3
+
+[node name="head_0" type="MarginContainer" parent="neck"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("2_koqqg")
+
+[node name="text" type="Label" parent="neck/head_0"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+theme = ExtResource("2_koqqg")
+text = "Head0asdasdasdasd"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="head_1" type="MarginContainer" parent="neck"]
+layout_mode = 2
+theme = ExtResource("2_koqqg")
+
+[node name="text" type="Label" parent="neck/head_1"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+theme = ExtResource("2_koqqg")
+text = "Head0"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
+
+[node name="head_2" type="MarginContainer" parent="neck"]
+layout_mode = 2
+theme = ExtResource("2_koqqg")
+
+[node name="text" type="Label" parent="neck/head_2"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+theme = ExtResource("2_koqqg")
+text = "Head0"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
+
+[node name="head_3" type="MarginContainer" parent="neck"]
+layout_mode = 2
+theme = ExtResource("2_koqqg")
+
+[node name="text" type="Label" parent="neck/head_3"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+theme = ExtResource("2_koqqg")
+text = "Head0"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
+
+[node name="center" type="MarginContainer" parent="neck"]
+layout_mode = 2
+theme = ExtResource("2_koqqg")
+
+[node name="text" type="Label" parent="neck/center"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("2_koqqg")
+text = "X"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
+
+[node name="head_5" type="MarginContainer" parent="neck"]
+layout_mode = 2
+theme = ExtResource("2_koqqg")
+
+[node name="text" type="Label" parent="neck/head_5"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+theme = ExtResource("2_koqqg")
+text = "Head0"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
+
+[node name="head_6" type="MarginContainer" parent="neck"]
+layout_mode = 2
+theme = ExtResource("2_koqqg")
+
+[node name="text" type="Label" parent="neck/head_6"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+theme = ExtResource("2_koqqg")
+text = "Head0"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
+
+[node name="head_7" type="MarginContainer" parent="neck"]
+layout_mode = 2
+theme = ExtResource("2_koqqg")
+
+[node name="text" type="Label" parent="neck/head_7"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+theme = ExtResource("2_koqqg")
+text = "Head0"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
+
+[node name="head_8" type="MarginContainer" parent="neck"]
+layout_mode = 2
+theme = ExtResource("2_koqqg")
+
+[node name="text" type="Label" parent="neck/head_8"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+theme = ExtResource("2_koqqg")
+text = "Head0"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1

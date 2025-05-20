@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://qde851w0coic"]
+
+[ext_resource type="Shader" path="res://assets/shaders/temp_ground.gdshader" id="1_jtyu0"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_jtyu0")
+shader_parameter/OFFSET = -1.2
+shader_parameter/SCALE = 8.5
+shader_parameter/HALF_POINT = 3.0

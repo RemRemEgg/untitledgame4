@@ -1,0 +1,71 @@
+[gd_scene load_steps=10 format=3 uid="uid://brdvu35yxiufs"]
+
+[ext_resource type="Script" uid="uid://b51hwk3k3j0c7" path="res://data/game/entity.gd" id="1_bjef8"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_m8rj6"]
+radius = 16.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_u6pa5"]
+flip_faces = true
+size = Vector3(6, 6, 6)
+
+[sub_resource type="Curve" id="Curve_5e4ec"]
+_limits = [0.0, 3.0, 0.0, 1.0]
+_data = [Vector2(0, 0), 0.0, 3.0, 0, 1, Vector2(1, 3), 3.0, 0.0, 1, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_2aw18"]
+curve = SubResource("Curve_5e4ec")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_7ypmv"]
+emission_shape = 3
+emission_box_extents = Vector3(0.1, 0.2, 0.8)
+direction = Vector3(-1, 0, 0)
+spread = 25.0
+initial_velocity_min = 1.5
+initial_velocity_max = 1.5
+gravity = Vector3(0, 0, 0)
+damping_min = 0.5
+damping_max = 0.5
+scale_over_velocity_min = 1.0
+scale_over_velocity_max = 3.0
+scale_over_velocity_curve = SubResource("CurveTexture_2aw18")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_75ki6"]
+albedo_color = Color(0.207512, 0.207512, 0.207512, 1)
+
+[sub_resource type="PrismMesh" id="PrismMesh_lt1bl"]
+material = SubResource("StandardMaterial3D_75ki6")
+size = Vector3(0.2, 0.2, 0.2)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hffjx"]
+radius = 18.0
+
+[node name="entity" type="CharacterBody2D"]
+collision_layer = 34
+collision_mask = 43
+motion_mode = 1
+script = ExtResource("1_bjef8")
+
+[node name="collision_shape_2d" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_m8rj6")
+debug_color = Color(0, 0.554097, 0.90918, 0.42)
+
+[node name="mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_u6pa5")
+skeleton = NodePath("")
+
+[node name="particles" type="GPUParticles3D" parent="mesh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.47745, 0, 0)
+lifetime = 3.0
+speed_scale = 3.0
+process_material = SubResource("ParticleProcessMaterial_7ypmv")
+draw_pass_1 = SubResource("PrismMesh_lt1bl")
+
+[node name="hurtbox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 4
+
+[node name="collision_shape_2d" type="CollisionShape2D" parent="hurtbox"]
+shape = SubResource("CircleShape2D_hffjx")
+debug_color = Color(0, 0.636, 0.408, 0.152)

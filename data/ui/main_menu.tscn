@@ -1,0 +1,57 @@
+[gd_scene load_steps=3 format=3 uid="uid://bm4cdmgtm0dlj"]
+
+[ext_resource type="Script" path="res://data/ui/main_menu.gd" id="1_wxdw4"]
+[ext_resource type="Theme" uid="uid://30k0orm342ib" path="res://data/ui/global.tres" id="2_k50cb"]
+
+[node name="main_menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_wxdw4")
+
+[node name="margin_container" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="h_box_container" type="HBoxContainer" parent="margin_container"]
+layout_mode = 2
+
+[node name="v_box_container" type="VBoxContainer" parent="margin_container/h_box_container"]
+layout_mode = 2
+
+[node name="rich_text_label" type="RichTextLabel" parent="margin_container/h_box_container/v_box_container"]
+custom_minimum_size = Vector2(260, 50)
+layout_mode = 2
+theme = ExtResource("2_k50cb")
+theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/bold_font_size = 32
+bbcode_enabled = true
+text = "untitledgame4"
+
+[node name="start_game" type="Button" parent="margin_container/h_box_container/v_box_container"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme = ExtResource("2_k50cb")
+text = "# start game"
+
+[node name="sdf_test" type="Button" parent="margin_container/h_box_container/v_box_container"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme = ExtResource("2_k50cb")
+text = "# sdf test"
+
+[node name="v_box_container_2" type="VBoxContainer" parent="margin_container/h_box_container"]
+layout_mode = 2

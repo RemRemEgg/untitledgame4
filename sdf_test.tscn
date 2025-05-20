@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://45y566yeigas"]
+
+[ext_resource type="Script" path="res://data/game/sdf_builder.gd" id="1_segsh"]
+[ext_resource type="Shader" path="res://assets/shaders/sdf_test.gdshader" id="2_ngple"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sdx6s"]
+render_priority = 0
+shader = ExtResource("2_ngple")
+
+[sub_resource type="BoxMesh" id="BoxMesh_rlrxn"]
+lightmap_size_hint = Vector2i(104, 156)
+material = SubResource("ShaderMaterial_sdx6s")
+flip_faces = true
+size = Vector3(10, 10, 10)
+
+[node name="sdf_test" type="Node3D"]
+script = ExtResource("1_segsh")
+
+[node name="mesh_instance_3d" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.99999, -0.00445057, 0, 0.00445057, 0.99999, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("BoxMesh_rlrxn")
+
+[node name="camera_3d" type="Camera3D" parent="."]
+transform = Transform3D(-0.808765, -0.416777, 0.414964, 0.00732733, 0.698369, 0.715701, -0.588086, 0.581875, -0.561762, 2.41862, 3.24582, -2.78433)
+fov = 39.2315
