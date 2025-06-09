@@ -43,8 +43,8 @@ float mat_group_2(vec3 point) {
 
 float sdf_all( vec3 point ) { return min(min(mat_group_0(point),mat_group_1(point)),mat_group_2(point));}
 
-const float h = 0.005;
-vec3 get_sdf_normal( vec3 point ) {
+//const float h = 0.01;
+vec3 get_sdf_normal( vec3 point, float h ) {
 	return normalize(
 		vec3(1,-1,-1)*sdf_all(point + vec3(1,-1,-1)*h) +
 		vec3(1,1,1)*sdf_all(point + vec3(1,1,1)*h) +
@@ -54,7 +54,7 @@ vec3 get_sdf_normal( vec3 point ) {
 }
 
 void fragment() {
-	vec3 ray_dir, ray_org;
+	vec3 ray_dir, ray_org, trash;
 	setup(ray_dir, ray_org, VIEW, VERTEX, VIEW_MATRIX, MODEL_MATRIX);
 	if (!snap_bounds(ray_org, ray_dir, vec3(3.0))) discard;
 	ALBEDO = vec3(0.0);
@@ -67,7 +67,7 @@ void fragment() {
 		ray_pos = ray_org + ray_dir*t;
 		d = sdf_all(ray_pos);
 		t += max(0.0, d);
-		if (d < 0.005) break;
+		if (d < FI) break;
 	}
 	for (; i < 100 && t < 8.0; i++) {
 		ray_pos = ray_org + ray_dir*t;
@@ -93,15 +93,21 @@ void fragment() {
 	}; if (t > 8.0) discard;
 	
 	ray_pos = ray_org + ray_dir*t;
+	vec3 normal = get_sdf_normal(ray_pos, 0.001);
 	vec3 light_dir = (vec4(LIGHT_DIR, 1.0)*MODEL_MATRIX).xyz;
-	ALBEDO *= clamp(dot(get_sdf_normal(ray_pos), light_dir), 0.01, 1.0);
-	d = 0.0; t = 0.01;
-	for (int i = 0; i < 50 && t < 5.0; i++) {
-		d = sdf_all(ray_pos + light_dir*t);
-		if (d < 0.001) { ALBEDO *= 0.01; break; }
-		t += d;
-	}
-	ALBEDO *= 1.0 + dot(get_sdf_normal(ray_pos), -(ray_dir)) * 1.5;
-	ALBEDO *= 1.0 + dot(get_sdf_normal(ray_pos), -(VIEW)) * 1.5;
+	float light_level = 0.75;
+	
+	light_level *= max(dot(normal, light_dir), 0.0);
+	
+	float cx = floor(light_level * 4.0) / 4.0;
+	float ll_sv = light_level-cx; ll_sv *= ll_sv; ll_sv *= ll_sv; ll_sv *= ll_sv;
+	light_level = (4.*4.*4.*4.*4.*4.*4.)*ll_sv+cx;
+	
+	vec3 fw_normal = get_sdf_normal(ray_pos, 0.01);
+	float fw = length(fwidth(fw_normal));
+	light_level *= 1.0 + fw*1.5;
+	
+	ALBEDO *= clamp(light_level, 0.01, 1.05);
+	ALBEDO = 0.6 * (ALBEDO * ALBEDO + ALBEDO * 2.0);
 	if (hurt) ALBEDO = (vec3(1.0)*0.3 + ALBEDO) / 1.3;
 }

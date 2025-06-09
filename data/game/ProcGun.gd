@@ -18,7 +18,7 @@ extends RefCounted
 
 enum {STYLE_GUN, STYLE_REPEATER}
 var style: int
-var fire_rate := 1.0
+var fire_rate := 1.0    # -, -,
 var style_data_i := 0   # -, repeat count
 var style_data_f := 0.0 # -, repeat delay
 
@@ -37,64 +37,55 @@ static func make() -> ProcGun:
 	
 	return gun
 
-func make_gun() -> Gun:
-	var gun := Gun.new()
-	gun.proc = self
-	return gun
-
 func add_modifier(type: int, data: float = 0.0) -> void:
 	mod_stack.append(type)
 	mod_data.append(data)
 
 
 
-func process(gun: Gun, delta: float) -> void:
+func process(gun: Gun, entity: Entity, delta: float) -> void:
 	match style:
 		STYLE_GUN:
 			gun.fire_timer += delta * fire_rate
 			while gun.fire_timer > 1.0:
-				fire(gun)
+				fire(gun, entity, (gun.fire_timer - 1.0) / fire_rate)
 				gun.fire_timer -= 1.0
 		STYLE_REPEATER:
 			if gun.fire_timer < 0:
-				var vop := ceilf(floorf(gun.fire_timer + delta*style_data_f) - gun.fire_timer)
-				#ceilf((-5.2) - floorf((-5.2) + 0.3))
-				gun.fire_timer += delta * style_data_f
-				#vop = gun.fire_timer - vop
+				var inc: float = min(gun.fire_timer + delta * style_data_f, 0.0)
+				var vop: int = absi(int(inc) - int(gun.fire_timer))
 				while vop > 0:
+					fire(gun, entity, (inc - floorf(inc) + vop - 1) / style_data_f)
 					vop -= 1
-					fire(gun)
-				#if floorf((gun.fire_timer) / style_data_f) != floorf((gun.fire_timer + delta) / style_data_f):
-					#fire(gun)
-				#gun.fire_timer += delta
+				gun.fire_timer = inc
 			else:
 				gun.fire_timer += delta * fire_rate
-				if gun.fire_timer > 1.0: gun.fire_timer = -style_data_i
+				if gun.fire_timer >= 1.0: gun.fire_timer = -style_data_i
 
-func fire(gun: Gun) -> void:
-	var entity := gun.owner
-	process_modifier(entity.global_position + Vector2.RIGHT.rotated(entity.rotation) * 22.0, entity.rotation, 0, ~entity.team)
+func fire(gun: Gun, entity: Entity, delta: float) -> void:
+	process_modifier(entity.global_position + Vector2.RIGHT.rotated(entity.rotation) * 22.0, entity.rotation, 0, entity, delta)
 
 
-func process_modifier(pos: Vector2, dir: float, i: int, team: int) -> void:
-	if i >= mod_stack.size(): return make_bullets(pos, dir, team)
+func process_modifier(pos: Vector2, dir: float, i: int, ownr: Entity, delta: float) -> void:
+	if i >= mod_stack.size(): return make_bullets(pos, dir, ownr, delta)
 	match mod_stack[i]:
 		MOD_DUAL:
 			var perp: Vector2 = Vector2.RIGHT.rotated(dir + PI/2) * mod_data[i]
-			process_modifier(pos + perp, dir, i+1, team)
-			process_modifier(pos - perp, dir, i+1, team)
+			process_modifier(pos + perp, dir, i+1, ownr, delta)
+			process_modifier(pos - perp, dir, i+1, ownr, delta)
 		MOD_SHOTGUN:
 			for __ in int(mod_data[i]):
-				process_modifier(pos, dir + randf_range(-0.15, 0.15), i+1, team)
+				process_modifier(pos, dir + randf_range(-0.15, 0.15), i+1, ownr, delta)
 		MOD_SPREAD:
 			var s := -mod_data[i]; while s < mod_data[i]:
-				process_modifier(pos, dir + s*0.1, i+1, team)
+				process_modifier(pos, dir + s*0.1, i+1, ownr, delta)
 				s += 1.0
 		MOD_SURROUND:
 			for s in mod_data[i]:
-				process_modifier(pos, dir + s*((2*PI)/mod_data[i]), i+1, team)
+				process_modifier(pos, dir + s*((2*PI)/mod_data[i]), i+1, ownr, delta)
 
 
-func make_bullets(pos: Vector2, dir: float, team: int) -> void:
-	proj.make_projectile(pos, dir+ randf_range(-inaccuracy, inaccuracy), team)
+func make_bullets(pos: Vector2, dir: float, ownr: Entity, delta: float) -> void:
+	var pp := proj.make_projectile(pos, dir+ randf_range(-inaccuracy, inaccuracy), ownr)
+	pp._process(delta)
 	return

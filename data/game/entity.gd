@@ -23,6 +23,7 @@ func move_and_bonus(move: Vector2, bonus_move_: float, delta: float) -> void:
 
 
 var proc: ProcEntity
+var target: Entity
 
 var mesh: MeshInstance3D
 var rotlerp: Vector2
@@ -30,7 +31,7 @@ var hurt_text: TextPopup
 var team: int = 0x0
 var state: int = 0
 
-var gun: Gun
+var guns: Array[Gun]
 
 var health: float = 20.0
 var hurt_time: float = 0.0

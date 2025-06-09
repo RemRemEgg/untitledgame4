@@ -38,28 +38,23 @@ class STAT: enum {
 static var STAT_NAMES: PackedStringArray = ["MDAMAGE", "SDAMAGE", "PIERCE", "HEALTH", "SHIELD", "VAMP", "CRITX", "CRITP", "EXECUTE", "STATEFF", "_dne", "MSFRATE", "FOCUS", "SPECIAL", "ULTIMATE"]
 static func string_to_stat(name: String) -> int: return STAT_NAMES.find(name)
 
-var sec_timer: float
 
 
 func _ready() -> void:
 	ProcPlayer.make().bind(self)
+	
 	var steal := Global.SCN_ENTITY.instantiate() as Entity
 	mesh = steal.get_node("mesh")
 	mesh.get_parent().remove_child(mesh)
 	steal.queue_free()
 	mesh.owner = null
 	mesh.material_override = proc.shader_mat
-	($hurtbox as Area2D).body_entered.connect(_hurtbox_hit)
 	Global.Game.render.add_child(mesh)
+	
+	($hurtbox as Area2D).body_entered.connect(_hurtbox_hit)
 	state = 1
 
-#func fire() -> void: Projectile.make(global_position + Vector2.from_angle(rotation) * 24.0, rotation + randf_range(-0.1, 0.1), Global.TEAM.HOSTILE, data)
-
-#func _process(delta: float) -> void:pass
-
 class ProcPlayer extends ProcEntity:
-	var secondary: Gun
-	
 	static func make() -> ProcPlayer:
 		var pp := ProcPlayer.new()
 		
@@ -73,11 +68,15 @@ class ProcPlayer extends ProcEntity:
 		ppo.speed = 1200.0
 		pg.proj = ppo
 		pg.style = ProcGun.STYLE_REPEATER
-		pg.fire_rate = 1.0
-		pg.style_data_i = 5
-		pg.style_data_f = 50
-		pg.inaccuracy = 0.1
-		pp.gun = pg
+		pg.fire_rate = 2.
+		pg.style_data_i = 60
+		pg.style_data_f = 300
+		pg.inaccuracy = 0.0
+		#pg.style = ProcGun.STYLE_GUN
+		#pg.fire_rate = 10
+		#pg.add_modifier(ProcGun.MOD_SPREAD, 5.0)
+		#pg.inaccuracy = 0.0
+		pp.guns.append(pg)
 		
 		
 		return pp
@@ -87,8 +86,12 @@ class ProcPlayer extends ProcEntity:
 		player.proc = self
 		player.team = Global.TEAM.FRIENDLY
 		player.health = 100000
-		player.gun = gun.make_gun()
-		player.gun.owner = player
+		player.guns = []
+		player.guns.resize(guns.size())
+		
+		player.guns = []
+		player.guns.resize(guns.size())
+		for i in guns.size(): player.guns[i] = Gun.new()
 	
 	
 	func process(entity: Entity, delta: float) -> void:
@@ -100,5 +103,4 @@ class ProcPlayer extends ProcEntity:
 		
 		player.move_and_slide()
 		
-		
-		gun.process(player.gun, delta)
+		for i in guns.size(): guns[i].process(player.guns[i], player, delta)

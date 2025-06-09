@@ -1,0 +1,79 @@
+[gd_scene load_steps=3 format=3 uid="uid://c40rsyavkj1gl"]
+
+[ext_resource type="Script" uid="uid://d1m6c7la88les" path="res://data/ui/game_menu.gd" id="1_xtr73"]
+[ext_resource type="PackedScene" uid="uid://45y566yeigas" path="res://sdf_test.tscn" id="2_1mkvc"]
+
+[node name="game_menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_xtr73")
+
+[node name="margin_container" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="flow_container" type="FlowContainer" parent="margin_container"]
+layout_mode = 2
+vertical = true
+
+[node name="icon" type="ColorRect" parent="margin_container/flow_container"]
+custom_minimum_size = Vector2(256, 256)
+layout_mode = 2
+color = Color(0.427493, 0.427493, 0.427493, 1)
+
+[node name="sub_viewport_container" type="SubViewportContainer" parent="margin_container/flow_container/icon"]
+custom_minimum_size = Vector2(256, 256)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -128.0
+offset_top = -128.0
+offset_right = 128.0
+offset_bottom = 128.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="sub_viewport" type="SubViewport" parent="margin_container/flow_container/icon/sub_viewport_container"]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(256, 256)
+render_target_update_mode = 4
+
+[node name="sdf_test" parent="margin_container/flow_container/icon/sub_viewport_container/sub_viewport" instance=ExtResource("2_1mkvc")]
+
+[node name="stats" type="RichTextLabel" parent="margin_container/flow_container"]
+custom_minimum_size = Vector2(0, 380)
+layout_mode = 2
+size_flags_vertical = 3
+text = "-
+-
+-
+-"
+
+[node name="label" type="Label" parent="margin_container/flow_container"]
+layout_mode = 2
+text = "Level"
+
+[node name="spin_box" type="SpinBox" parent="margin_container/flow_container"]
+layout_mode = 2
+max_value = 8.0
+rounded = true
+
+[node name="start_game" type="Button" parent="margin_container/flow_container"]
+layout_mode = 2
+text = "Start Game"

@@ -1,7 +1,8 @@
 class_name Projectile
-extends CharacterBody2D
+extends PhysicsBody2D
 
 var proc: ProcProj
+var ownr: Entity
 
 var mesh: MeshInstance3D
 
@@ -37,19 +38,6 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	proc.process(self, delta)
-	#velocity = Vector2.RIGHT.rotated(rotation) * speed
-	#move_and_slide()
-	#mesh.global_position = up_dim(global_position)
-	#
-	#health -= delta
-	#if health <= 0.0: kill()
 
 func _process_collision(entity: Entity) -> void:
 	proc.process_collision(self, entity)
-	
-	#if !(can_hurt & entity.team): return
-	#DAMAGE_DATA[0] = damage
-	#entity._process_damage()
-	#
-	#pierce -= 1
-	#if pierce < 0: kill()

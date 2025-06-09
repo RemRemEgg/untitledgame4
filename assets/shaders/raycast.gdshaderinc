@@ -23,4 +23,6 @@ void setup(inout vec3 ray_dir, inout vec3 ray_org, vec3 pVIEW, vec3 pVERTEX, mat
 	mat4 inv_modelview = inverse(pVIEW_MATRIX * pMODEL_MATRIX);
 	ray_org = (inv_modelview * vec4(ray_org,1.0)).xyz;
 	ray_dir = normalize( mat3(inv_modelview) * ray_dir );
+	//cam_dir = NODE_POSITION_VIEW;
+	//cam_dir = normalize( mat3(pVIEW_MATRIX) * vec3(0.0, 0.0, 1.0) );
 }

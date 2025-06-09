@@ -14,8 +14,7 @@ config/name="untitledgame4"
 config/tags=PackedStringArray("game", "procedural")
 run/main_scene="res://data/ui/startup.tscn"
 config/features=PackedStringArray("4.4", "Forward Plus")
-run/max_fps=30
-run/low_processor_mode=true
+run/max_fps=60
 boot_splash/show_image=false
 boot_splash/use_filter=false
 config/icon="res://assets/ui/ug4.png"
@@ -28,8 +27,6 @@ Hydra="*res://data/ui/hydra.tscn"
 
 [display]
 
-window/stretch/mode="viewport"
-window/stretch/scale=2.0
 window/vsync/vsync_mode=0
 
 [editor]

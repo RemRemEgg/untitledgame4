@@ -6,20 +6,18 @@ var shader_mat: ShaderMaterial
 var rot_speed: float = 1.0
 var speed: float = 400.0
 var bonus_speed: float = 1.15
-var gun: ProcGun
+var guns: Array[ProcGun] = []
 
 static func make() -> ProcEntity:
 	var pe := ProcEntity.new()
 	
 	pe.shader_mat = SDFBuilder.new().build_shader(Vector3(randf(), randf(), randf()).normalized() * 7./5)
 	
-	#var gun: ProcGun = ProcGun.make(randi_range(ProcGun., ProcGun.))
 	var gun: ProcGun = ProcGun.make()
-	pe.gun = gun
-	
 	var proj: ProcProj = ProcProj.new()
 	proj.speed = 600.0
-	pe.gun.proj = proj
+	gun.proj = proj
+	pe.guns.append(gun)
 	
 	return pe
 
@@ -27,8 +25,9 @@ static func make() -> ProcEntity:
 func bind(entity: Entity) -> void:
 	entity.proc = self
 	entity.team = Global.TEAM.HOSTILE
-	entity.gun = gun.make_gun()
-	entity.gun.owner = entity
+	entity.guns = []
+	entity.guns.resize(guns.size())
+	for i in guns.size(): entity.guns[i] = Gun.new()
 
 
 func preprocess() -> void:
@@ -36,8 +35,8 @@ func preprocess() -> void:
 
 
 func process(entity: Entity, delta: float) -> void:
-	
 	var target := Global.Game.player as Entity
+	
 	var p := (target.global_position - Entity.CENTER)*0.35 + target.global_position
 	var c := (Entity.CENTER - entity.global_position).normalized()
 	var t := (p - entity.global_position)
@@ -51,7 +50,10 @@ func process(entity: Entity, delta: float) -> void:
 	
 	entity.move_and_slide()
 	
-	gun.process(entity.gun, delta)
+	for i in guns.size(): guns[i].process(entity.guns[i], entity, delta)
 	
 	
 	Entity.CENTER_AVG += Vector3(entity.global_position.x, entity.global_position.y, 1)
+
+func update_target(entity: Entity) -> void:
+	pass

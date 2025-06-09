@@ -33,12 +33,13 @@ static func make() -> ProcProj:
 	return pp
 
 
-func make_projectile(pos: Vector2, dir: float, hurt_team: int) -> Projectile:
+func make_projectile(pos: Vector2, dir: float, ownr: Entity) -> Projectile:
 	var proj := Global.SCN_PROJECTILE.instantiate() as Projectile
 	proj.proc = self
 	proj.global_position = pos
 	proj.rotation = dir
-	proj.can_hurt = hurt_team
+	proj.ownr = ownr
+	proj.can_hurt = ~ownr.team
 	Global.Game.projectiles.add_child(proj)
 	
 	proj.speed = speed
@@ -51,8 +52,7 @@ func make_projectile(pos: Vector2, dir: float, hurt_team: int) -> Projectile:
 
 
 func process(proj: Projectile, delta: float) -> void:
-	proj.velocity = Vector2.RIGHT.rotated(proj.rotation) * speed
-	proj.move_and_slide()
+	proj.move_and_collide(Vector2.RIGHT.rotated(proj.rotation) * speed * delta, false, 0.08, false)
 	proj.mesh.global_position = Entity.up_dim(proj.global_position)
 	proj.mesh.rotation.y = PI/2-proj.rotation
 	
