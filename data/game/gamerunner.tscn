@@ -1,37 +1,64 @@
-[gd_scene load_steps=12 format=3 uid="uid://bswu5ecv41c3d"]
+[gd_scene load_steps=18 format=3 uid="uid://bswu5ecv41c3d"]
 
 [ext_resource type="Script" uid="uid://c7y4ftog1i33k" path="res://data/game/gamerunner.gd" id="1_6guqb"]
 [ext_resource type="PackedScene" uid="uid://ccn2p7ejk1lh2" path="res://data/ui/hud.tscn" id="2_oa86o"]
 [ext_resource type="Material" uid="uid://d0mfmmsdfp221" path="res://assets/shaders/barrier.tres" id="4_pc6ge"]
-[ext_resource type="Material" uid="uid://cw70lnbkyw168" path="res://assets/shaders/grid.res" id="5_e8kgx"]
 [ext_resource type="Material" uid="uid://qde851w0coic" path="res://assets/shaders/temp_ground.tres" id="6_42o02"]
+[ext_resource type="Shader" uid="uid://3gqyohrvoefk" path="res://assets/shaders/sdf_test.gdshader" id="6_p1tdy"]
 [ext_resource type="Script" uid="uid://c4ojj7hck0sxg" path="res://data/game/camera.gd" id="7_0mhq4"]
+[ext_resource type="Shader" uid="uid://dra5l8driyk4b" path="res://assets/shaders/pannini.gdshader" id="7_pd4g0"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_p1tdy"]
+friction = 0.0
+bounce = 5.45
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_3pd7d"]
 custom_solver_bias = 1.0
 normal = Vector2(0, 1)
 distance = -160.0
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_pd4g0"]
+noise_type = 0
+frequency = 0.006
+fractal_octaves = 1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_esl6g"]
+width = 1600
+height = 900
+noise = SubResource("FastNoiseLite_pd4g0")
+
 [sub_resource type="Environment" id="Environment_p1tdy"]
-glow_levels/1 = 0.1
-glow_levels/2 = 0.2
-glow_levels/3 = 0.15
-glow_levels/4 = 0.1
+background_mode = 4
+background_energy_multiplier = 0.0
+tonemap_mode = 3
+tonemap_exposure = 1.2
+tonemap_white = 0.8
+glow_enabled = true
+glow_levels/1 = 0.7
+glow_levels/2 = 0.8
+glow_levels/3 = 0.5
 glow_levels/5 = 0.0
-glow_intensity = 2.0
-glow_strength = 2.0
+glow_intensity = 0.3
+glow_strength = 1.8
 glow_mix = 0.15
 glow_blend_mode = 1
-glow_hdr_threshold = 4.0
+glow_map = SubResource("NoiseTexture2D_esl6g")
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_0s54a"]
 viewport_path = NodePath("vp/sub_vp")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pd4g0"]
+render_priority = 0
+shader = ExtResource("6_p1tdy")
 
 [sub_resource type="TorusMesh" id="TorusMesh_kvoni"]
 rings = 16
 ring_segments = 8
 
 [sub_resource type="SphereMesh" id="SphereMesh_n6n52"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_p1tdy"]
+shader = ExtResource("7_pd4g0")
 
 [node name="gamerunner" type="Node"]
 script = ExtResource("1_6guqb")
@@ -67,6 +94,7 @@ render_target_update_mode = 4
 
 [node name="bounds" type="StaticBody2D" parent="vp/sub_vp/world_2d"]
 scale = Vector2(8, 8)
+physics_material_override = SubResource("PhysicsMaterial_p1tdy")
 
 [node name="n" type="CollisionShape2D" parent="vp/sub_vp/world_2d/bounds"]
 shape = SubResource("WorldBoundaryShape2D_3pd7d")
@@ -190,7 +218,7 @@ gi_mode = 0
 
 [node name="dornut" type="MeshInstance3D" parent="world_3d/render"]
 transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, -3, 0)
-material_override = ExtResource("5_e8kgx")
+material_override = SubResource("ShaderMaterial_pd4g0")
 mesh = SubResource("TorusMesh_kvoni")
 skeleton = NodePath("../../..")
 
@@ -198,3 +226,13 @@ skeleton = NodePath("../../..")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.69948)
 material_override = ExtResource("6_42o02")
 mesh = SubResource("SphereMesh_n6n52")
+
+[node name="canvas_layer" type="CanvasLayer" parent="."]
+
+[node name="color_rect" type="ColorRect" parent="canvas_layer"]
+material = SubResource("ShaderMaterial_p1tdy")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

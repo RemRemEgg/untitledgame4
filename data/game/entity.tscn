@@ -1,13 +1,18 @@
-[gd_scene load_steps=10 format=3 uid="uid://brdvu35yxiufs"]
+[gd_scene load_steps=12 format=3 uid="uid://brdvu35yxiufs"]
 
 [ext_resource type="Script" uid="uid://b51hwk3k3j0c7" path="res://data/game/entity.gd" id="1_bjef8"]
+[ext_resource type="Shader" uid="uid://3gqyohrvoefk" path="res://assets/shaders/sdf_test.gdshader" id="2_uukyg"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_m8rj6"]
 radius = 16.0
 
-[sub_resource type="BoxMesh" id="BoxMesh_u6pa5"]
-flip_faces = true
-size = Vector3(6, 6, 6)
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_l70t0"]
+render_priority = 0
+shader = ExtResource("2_uukyg")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_bjef8"]
+material = SubResource("ShaderMaterial_l70t0")
+size = Vector2(6, 6)
 
 [sub_resource type="Curve" id="Curve_5e4ec"]
 _limits = [0.0, 3.0, 0.0, 1.0]
@@ -52,7 +57,7 @@ shape = SubResource("CircleShape2D_m8rj6")
 debug_color = Color(0, 0.554097, 0.90918, 0.42)
 
 [node name="mesh" type="MeshInstance3D" parent="."]
-mesh = SubResource("BoxMesh_u6pa5")
+mesh = SubResource("PlaneMesh_bjef8")
 skeleton = NodePath("")
 
 [node name="particles" type="GPUParticles3D" parent="mesh"]
@@ -63,8 +68,8 @@ process_material = SubResource("ParticleProcessMaterial_7ypmv")
 draw_pass_1 = SubResource("PrismMesh_lt1bl")
 
 [node name="hurtbox" type="Area2D" parent="."]
-collision_layer = 0
-collision_mask = 4
+collision_layer = 4
+collision_mask = 0
 
 [node name="collision_shape_2d" type="CollisionShape2D" parent="hurtbox"]
 shape = SubResource("CircleShape2D_hffjx")

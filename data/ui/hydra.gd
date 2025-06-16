@@ -19,17 +19,81 @@ func _ready() -> void:
 	var heal := HydraHead.make("Heal", func()->void: Global.Game.player.health = 1000000)
 	var spawn_enemy := HydraHead.make("Spawn Enemy", func()->void: Global.Game.create_enemy(Global.Game.player.get_global_mouse_position()))
 	var teleport := HydraHead.make("Teleport", func()->void: Global.Game.player.position = Global.Game.player.get_global_mouse_position())
+	var _TEMP_miniboss := HydraHead.make("Miniboss", _TEMP_make_miniboss)
 	
 	
 	var kill_all := HydraHead.make("Kill All", func()->void: for e in Global.Game.entities.get_children(): if e is Entity: (e as Entity).kill())
 	var boost_neck := HydraNeck.make("Boost", [kill_all])
 	
-	root = HydraNeck.make("root", [heal, spawn_enemy, teleport, PASS, boost_neck])
+	root = HydraNeck.make("root", [heal, spawn_enemy, teleport, PASS, boost_neck, _TEMP_miniboss])
 	
 	set_active_neck(root)
 
-func set_active_neck(hn: HydraNeck) -> void:
 
+func _TEMP_make_miniboss() -> void:
+	var pe := ProcEntity.new()
+	
+	var iks := randi()
+	seed(15973)
+	pe.shader_mat = SDFBuilder.new().build_shader_3D(Vector3(1.1, 0.2, 1.5))
+	seed(iks)
+	
+	
+	
+	var proj: ProcProj = ProcProj.make()
+	proj.speed = 600.0
+	var main := ProcGun.make()
+	main.proj = proj
+	main.fire_rate = 2.0
+	main.add_modifier(ProcGun.MOD_SPREAD, 3.0)
+	pe.guns.append(main)
+	
+	var sproj: ProcProj = ProcProj.make()
+	sproj.speed = 1000.0
+	sproj.damage = 0.5
+	var sec := ProcGun.make()
+	sec.proj = sproj
+	sec.style = ProcGun.STYLE_REPEATER
+	sec.fire_rate = 1./10
+	sec.style_data_f = 30
+	sec.style_data_i = 30*5
+	sec.add_modifier(ProcGun.MOD_DUAL, 22)
+	pe.guns.append(sec)
+	
+	var bproj: ProcProj = ProcProj.make()
+	bproj.speed = 250.0
+	bproj.damage = 100
+	bproj.scale = 5.0
+	bproj.max_health = 12.0
+	var burst := ProcGun.make()
+	burst.proj = bproj
+	burst.fire_rate = 1./15
+	burst.add_modifier(ProcGun.MOD_SURROUND, 12)
+	burst.add_modifier(ProcGun.MOD_DUAL, 24)
+	burst.add_modifier(ProcGun.MOD_DUAL, 12)
+	pe.guns.append(burst)
+	
+	
+	pe.speed = 250
+	pe.bonus_speed = 0.75
+	pe.rot_speed = 1.5
+	pe.sep_bias = 0.0
+	
+	var enemy := Global.SCN_ENTITY.instantiate() as Entity
+	enemy.global_position = Global.Game.player.get_global_mouse_position()
+	pe.bind(enemy)
+	Global.Game.entities.add_child(enemy)
+	
+	enemy.health = 1800
+	enemy.scale *= 4.0
+	enemy.mesh.scale *= 4.0
+
+
+
+
+
+
+func set_active_neck(hn: HydraNeck) -> void:
 	ct_neck.global_position = ct_neck.get_global_mouse_position() - HALF_SIZE
 	neck = hn
 	for i in ct_heads.size():

@@ -41,7 +41,7 @@ func _ready() -> void:
 
 var wave_delay: float = 1.0
 var wave_total: int
-var wave_count: int = 50
+var wave_count: int = 1
 
 
 func _process(delta: float) -> void:
@@ -81,11 +81,11 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		var eiemb := event as InputEventMouseButton
 		match eiemb.button_index:
-			1 when eiemb.pressed: spawn_enemy()
-			2 when eiemb.pressed: for c in Global.Game.entities.get_children(): c.kill()
+			#1 when eiemb.pressed: spawn_enemy()
+			#2 when eiemb.pressed: for c in Global.Game.entities.get_children(): c.kill()
 			3 when eiemb.pressed: player.global_position = player.get_global_mouse_position()
-			4 when eiemb.pressed: Engine.time_scale *= 2
-			5 when eiemb.pressed: Engine.time_scale *= 0.5
+			4 when eiemb.pressed: Engine.time_scale += 0.5
+			5 when eiemb.pressed: Engine.time_scale -= 0.5
 	if event is InputEventKey:
 		var eiek := event as InputEventKey
 		match eiek.keycode:

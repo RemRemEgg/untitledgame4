@@ -52,12 +52,12 @@ func process(gun: Gun, entity: Entity, delta: float) -> void:
 				gun.fire_timer -= 1.0
 		STYLE_REPEATER:
 			if gun.fire_timer < 0:
-				var inc: float = min(gun.fire_timer + delta * style_data_f, 0.0)
-				var vop: int = absi(int(inc) - int(gun.fire_timer))
+				var inc: float = gun.fire_timer + delta * style_data_f
+				var vop: int = absi(int(min(inc, 0.0)) - int(gun.fire_timer))
 				while vop > 0:
 					fire(gun, entity, (inc - floorf(inc) + vop - 1) / style_data_f)
 					vop -= 1
-				gun.fire_timer = inc
+				gun.fire_timer = min(inc, 0.0)
 			else:
 				gun.fire_timer += delta * fire_rate
 				if gun.fire_timer >= 1.0: gun.fire_timer = -style_data_i

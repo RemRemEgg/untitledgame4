@@ -1,27 +1,30 @@
-[gd_scene load_steps=5 format=3 uid="uid://c77mljxhhdyug"]
+[gd_scene load_steps=6 format=3 uid="uid://c77mljxhhdyug"]
 
 [ext_resource type="Script" uid="uid://b2xkyp2wgwbti" path="res://data/game/projectile.gd" id="1_c5sjs"]
+[ext_resource type="Shader" uid="uid://cle6c8xncs68o" path="res://assets/shaders/projectile.gdshader" id="2_t70da"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_se6g2"]
-radius = 4.0
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_f3vgd"]
+render_priority = 0
+shader = ExtResource("2_t70da")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o7fts"]
-shading_mode = 0
-albedo_color = Color(4, 1.2, 1, 1)
+[sub_resource type="PlaneMesh" id="PlaneMesh_bojni"]
+material = SubResource("ShaderMaterial_f3vgd")
+size = Vector2(4, 2)
+center_offset = Vector3(-0.5, 0, 0)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_bojni"]
-top_radius = 0.25
-bottom_radius = 0.25
+[sub_resource type="CylinderMesh" id="CylinderMesh_t70da"]
+top_radius = 0.333
+bottom_radius = 0.0
+height = 0.01
 
-[node name="projectile" type="CharacterBody2D"]
-collision_layer = 68
-collision_mask = 8
+[node name="projectile" type="Node2D"]
 script = ExtResource("1_c5sjs")
 
-[node name="collision_shape_2d" type="CollisionShape2D" parent="."]
-shape = SubResource("CircleShape2D_se6g2")
+[node name="mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_bojni")
 
-[node name="mesh_instance_3d" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.01, 0, 0, 0, 1, 0, 0, 0)
-material_override = SubResource("StandardMaterial3D_o7fts")
-mesh = SubResource("CylinderMesh_bojni")
+[node name="mesh_instance_3d" type="MeshInstance3D" parent="mesh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
+top_level = true
+visible = false
+mesh = SubResource("CylinderMesh_t70da")

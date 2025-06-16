@@ -15,11 +15,13 @@ func rotate_and_tilt(rot: Vector2, tilt: Vector2, delta: float) -> Vector2:
 	rotate(signf(agt) * minf(delta*proc.rot_speed, absf(agt)))
 	tilt = (tilt*Vector2(1,-1)).rotated(rotation)
 	tilt = Vector2(agt -tilt.y, -tilt.x)
-	rotlerp = Vector2(tilt.x/(absf(tilt.x)+1.0), tilt.y/(absf(tilt.y)+1.5))
+	rotlerp = Vector2(tilt.x/(absf(tilt.x)+1.0), tilt.y/(absf(tilt.y)+2.5))
 	return tilt
 func move_and_bonus(move: Vector2, bonus_move_: float, delta: float) -> void:
-	velocity *= 1.0 - delta
-	velocity += move * (proc.speed + proc.bonus_speed*bonus_move_) * delta
+	#velocity = velocity.move_toward(Vector2.ZERO, delta * proc.speed * 0.5 * ((velocity.length_squared() + 25**2) / (velocity.length_squared() + 30**2)))
+	velocity = velocity.move_toward(Vector2.ZERO, delta * velocity.length() * 1)
+	#velocity += move * ( + proc.bonus_speed*bonus_move_) * delta
+	velocity += move * proc.speed * (1.0 + proc.bonus_speed*bonus_move_) * delta
 
 
 var proc: ProcEntity
@@ -33,13 +35,13 @@ var state: int = 0
 
 var guns: Array[Gun]
 
-var health: float = 20.0
+var health: float = 60.0
 var hurt_time: float = 0.0
 
 func _ready() -> void:
 	mesh = $mesh as MeshInstance3D
 	mesh.material_override = proc.shader_mat
-	($hurtbox as Area2D).body_entered.connect(_hurtbox_hit)
+	#($hurtbox as Area2D).body_entered.connect(_hurtbox_hit)
 	remove_child(mesh)
 	Global.Game.render.add_child(mesh)
 	state = 1
@@ -61,7 +63,7 @@ func _hurtbox_hit(body: Node2D) -> void:
 		var proj := body as Projectile
 		proj._process_collision(self)
 
-func _process_damage() -> void:
+func _process_damage() -> float:
 	health -= DAMAGE_DATA[0]
 	
 	if hurt_text && is_instance_valid(hurt_text) && hurt_text.time < 0.25 && (hurt_text.position - global_position).length_squared() < 100025.0:
@@ -72,6 +74,7 @@ func _process_damage() -> void:
 	mesh.set_instance_shader_parameter("hurt", true)
 	
 	if health <= 0.0: kill()
+	return clamp((DAMAGE_DATA[0] + health) / DAMAGE_DATA[0], 0.0, 1.0)
 
 func kill() -> void:
 	if state == 2: return

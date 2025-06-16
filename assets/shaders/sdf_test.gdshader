@@ -2,7 +2,7 @@ shader_type spatial;
 render_mode unshaded;
 #include "res://assets/shaders/raycast.gdshaderinc"
 #include "res://assets/shaders/sdf.gdshaderinc"
-const vec3 LIGHT_DIR = vec3(0.657041, 0.657041, 0.369586);
+const vec3 LIGHT_DIR = -vec3(-0.5, -1.5, 0.9);
 const float FI = 0.005;
 instance uniform bool hurt = false;
 
@@ -94,8 +94,9 @@ void fragment() {
 	
 	ray_pos = ray_org + ray_dir*t;
 	vec3 normal = get_sdf_normal(ray_pos, 0.001);
-	vec3 light_dir = (vec4(LIGHT_DIR, 1.0)*MODEL_MATRIX).xyz;
+	vec3 light_dir = normalize((vec4(LIGHT_DIR, 1.0) * MODEL_MATRIX).xyz);
 	float light_level = 0.75;
+	
 	
 	light_level *= max(dot(normal, light_dir), 0.0);
 	

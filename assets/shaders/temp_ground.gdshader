@@ -26,5 +26,7 @@ void fragment() {
 	float ti = t - floor(t);
 	ti = 3.0*(ti*ti) - 2.0*(ti*ti*ti);
 	int i = int(t);
-	ALBEDO = ti * (COLORS[i+1] - COLORS[i]) + COLORS[i] * 0.5;
+	ALBEDO = (ti * (COLORS[i+1] - COLORS[i]) + COLORS[i]);
+	ALBEDO *= ALBEDO * ALBEDO * 0.1;
+	ROUGHNESS = 1.0;
 }

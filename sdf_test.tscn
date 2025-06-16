@@ -1,23 +1,30 @@
-[gd_scene load_steps=5 format=3 uid="uid://45y566yeigas"]
+[gd_scene load_steps=6 format=3 uid="uid://45y566yeigas"]
 
 [ext_resource type="Script" uid="uid://bl0vprje14lka" path="res://data/game/sdf_builder.gd" id="1_segsh"]
 [ext_resource type="Shader" uid="uid://3gqyohrvoefk" path="res://assets/shaders/sdf_test.gdshader" id="2_ngple"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_sdx6s"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_l70t0"]
 render_priority = 0
 shader = ExtResource("2_ngple")
 
-[sub_resource type="BoxMesh" id="BoxMesh_rlrxn"]
-lightmap_size_hint = Vector2i(104, 156)
-material = SubResource("ShaderMaterial_sdx6s")
-flip_faces = true
-size = Vector3(10, 10, 10)
+[sub_resource type="PlaneMesh" id="PlaneMesh_ngsuu"]
+material = SubResource("ShaderMaterial_l70t0")
+size = Vector2(6, 6)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ob2dm"]
+material = SubResource("ShaderMaterial_l70t0")
+size = Vector2(6, 6)
 
 [node name="sdf_test" type="Node3D"]
 script = ExtResource("1_segsh")
 
 [node name="mesh_instance_3d" type="MeshInstance3D" parent="."]
-mesh = SubResource("BoxMesh_rlrxn")
+mesh = SubResource("PlaneMesh_ngsuu")
+
+[node name="mesh_instance_3d_2" type="MeshInstance3D" parent="."]
+transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 100, 42.8806, 0, 15.9175)
+visible = false
+mesh = SubResource("PlaneMesh_ob2dm")
 
 [node name="camera_3d" type="Camera3D" parent="."]
 transform = Transform3D(-1, 6.68715e-08, -5.63111e-08, 0, 0.644124, 0.764921, 8.74228e-08, 0.764921, -0.644124, 0, 4.154, -3.493)

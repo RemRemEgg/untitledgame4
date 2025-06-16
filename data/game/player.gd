@@ -51,32 +51,55 @@ func _ready() -> void:
 	mesh.material_override = proc.shader_mat
 	Global.Game.render.add_child(mesh)
 	
-	($hurtbox as Area2D).body_entered.connect(_hurtbox_hit)
+	#($hurtbox as Area2D).body_entered.connect(_hurtbox_hit)
 	state = 1
 
 class ProcPlayer extends ProcEntity:
 	static func make() -> ProcPlayer:
 		var pp := ProcPlayer.new()
 		
-		pp.shader_mat = SDFBuilder.new().build_shader(Vector3(0.1, 0.5, 0.5))
+		pp.shader_mat = SDFBuilder.new().build_shader_3D(Vector3(0.1, 0.5, 0.5))
 		
 		pp.rot_speed = 4.8
-		pp.speed = 1000.0
+		pp.speed = 850.0
 		
-		var pg: ProcGun = ProcGun.make()
-		var ppo: ProcProj = ProcProj.make()
-		ppo.speed = 1200.0
-		pg.proj = ppo
-		pg.style = ProcGun.STYLE_REPEATER
-		pg.fire_rate = 2.
-		pg.style_data_i = 60
-		pg.style_data_f = 300
-		pg.inaccuracy = 0.0
-		#pg.style = ProcGun.STYLE_GUN
-		#pg.fire_rate = 10
-		#pg.add_modifier(ProcGun.MOD_SPREAD, 5.0)
-		#pg.inaccuracy = 0.0
-		pp.guns.append(pg)
+		var main_gun: ProcGun = ProcGun.make()
+		var main_proj: ProcProj = ProcProj.make()
+		main_gun.proj = main_proj
+		
+		var sec_gun: ProcGun = ProcGun.make()
+		var sec_proj: ProcProj = ProcProj.make()
+		sec_gun.proj = sec_proj
+		
+		main_gun.style = ProcGun.STYLE_GUN
+		main_gun.fire_rate = 14
+		main_gun.inaccuracy = 0.2
+		main_proj.speed = 900.0
+		main_proj.damage = 1.0
+		
+		sec_gun.style = ProcGun.STYLE_REPEATER
+		sec_gun.fire_rate = 0.7
+		sec_gun.style_data_i = 3
+		sec_gun.style_data_f = 100
+		sec_gun.add_modifier(ProcGun.MOD_DUAL, 12.0)
+		sec_gun.inaccuracy = 0.0
+		sec_proj.speed = 1600.0
+		sec_proj.damage = 2.0
+		sec_proj.depth = 1.0
+		
+		pp.guns.append(main_gun)
+		pp.guns.append(sec_gun)
+		
+		#var temp_gun := ProcGun.make()
+		#var temp_proj := ProcProj.make()
+		#temp_gun.proj = temp_proj
+		#temp_gun.style = ProcGun.STYLE_GUN
+		#temp_gun.fire_rate = 1.0
+		#temp_gun.inaccuracy = 0.0
+		#temp_proj.speed = 900
+		#temp_proj.damage = 1.0
+		#temp_proj.depth = 10
+		#pp.guns.append(temp_gun)
 		
 		
 		return pp
@@ -97,7 +120,6 @@ class ProcPlayer extends ProcEntity:
 	func process(entity: Entity, delta: float) -> void:
 		var player := entity as Player
 		var move := Input.get_vector(&"left", &"right", &"up", &"down")
-	
 		var tilt: Vector2 = player.rotate_and_tilt(player.get_global_mouse_position() - player.global_position, move, delta)
 		player.move_and_bonus(move, (400.0 if Input.is_action_pressed("boost") else 0.0)-tilt.y, delta)
 		

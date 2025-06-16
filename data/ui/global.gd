@@ -20,6 +20,7 @@ static var SCN_TEXT_POPUP: PackedScene
 class TEAM:
 	const FRIENDLY: int = 0x0000_0001
 	const HOSTILE: int = 0x0000_0010
+	const PROJECTILE: int = 0x0000_0100
 
 func _ready() -> void:
 	lines = $margin/vbox/lines as RichTextLabel

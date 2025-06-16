@@ -1,23 +1,27 @@
 class_name ProcEntity
-extends Object
+extends RefCounted
 
 var shader_mat: ShaderMaterial
 
-var rot_speed: float = 1.0
-var speed: float = 400.0
-var bonus_speed: float = 1.15
+var rot_speed: float = 1.2
+var speed: float = 350.0
+var bonus_speed: float = 0.1
 var guns: Array[ProcGun] = []
+
+var sep_bias: float = 0.0
 
 static func make() -> ProcEntity:
 	var pe := ProcEntity.new()
 	
-	pe.shader_mat = SDFBuilder.new().build_shader(Vector3(randf(), randf(), randf()).normalized() * 7./5)
+	pe.shader_mat = SDFBuilder.new().build_shader_3D(Vector3(randf(), randf(), randf()).normalized() * 7./5)
 	
 	var gun: ProcGun = ProcGun.make()
-	var proj: ProcProj = ProcProj.new()
+	var proj: ProcProj = ProcProj.make()
 	proj.speed = 600.0
 	gun.proj = proj
+	gun.fire_rate = 0.8
 	pe.guns.append(gun)
+	pe.sep_bias = (randf_range(0.0, 2.0)**2) / 4.2 + 0.05
 	
 	return pe
 
@@ -35,12 +39,14 @@ func preprocess() -> void:
 
 
 func process(entity: Entity, delta: float) -> void:
-	var target := Global.Game.player as Entity
+	if entity.target == null || !is_instance_valid(entity.target) || entity.target.state == 2:
+		if !update_target(entity): return
 	
+	var target := entity.target
 	var p := (target.global_position - Entity.CENTER)*0.35 + target.global_position
 	var c := (Entity.CENTER - entity.global_position).normalized()
 	var t := (p - entity.global_position)
-	var move := (t.normalized() - (c * 0.65)).normalized()
+	var move := (t.normalized() - (c * sep_bias)).normalized()
 	var dist := t.length()
 	var rotate := (target.global_position + target.velocity * 0.0015 * dist - entity.global_position).normalized()
 	
@@ -55,5 +61,8 @@ func process(entity: Entity, delta: float) -> void:
 	
 	Entity.CENTER_AVG += Vector3(entity.global_position.x, entity.global_position.y, 1)
 
-func update_target(entity: Entity) -> void:
-	pass
+func update_target(entity: Entity) -> bool:
+	if !entity is Player:
+		entity.target = Global.Game.player as Entity
+		return true
+	return false

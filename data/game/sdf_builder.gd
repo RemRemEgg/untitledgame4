@@ -5,25 +5,25 @@ var sdfs: PackedStringArray = PackedStringArray()
 var colors: PackedStringArray = PackedStringArray()
 var groups: int = 0
 
+#################
 func _ready() -> void:
-	(get_child(0) as MeshInstance3D).material_override = build_shader(Vector3(0.1, 0.5, 0.5))
-
+	(get_child(0) as MeshInstance3D).material_override = build_shader_3D(Vector3(0.1, 0.5, 0.5))
 func _process(delta: float) -> void:
 	(get_child(0) as MeshInstance3D).rotate(Vector3.UP, delta)
+func three_rng(m:float, M:float) -> String:
+	return str(randf_range(m,M)) + "," + str(randf_range(m,M)) + "," + str(randf_range(m,M))
+#################
 
-
-func build_shader(color: Vector3) -> ShaderMaterial:
+func build_shader_3D(color: Vector3) -> ShaderMaterial:
 	var mat := ShaderMaterial.new()
 	var shader := Shader.new()
-	build_shader_code(shader, color)
+	build_shader_code_3D(shader, color)
 	mat.shader = shader
 	return mat
 
-func three_rng(m:float, M:float) -> String:
-	return str(randf_range(m,M)) + "," + str(randf_range(m,M)) + "," + str(randf_range(m,M))
 
-func build_shader_code(shader: Shader, color: Vector3) -> void:
-	add_group("""
+func build_shader_code_3D(shader: Shader, color: Vector3) -> void:
+	add_group_3D("""
 	float b = sdf_cylinder_capped(point.yxz - vec3(0.0, 0.15, 0.0), 1.55, 0.3);
 	float c = sdf_box(point - vec3(-0.95, 0.0, 0.0), vec3(0.55, 0.35, abs(point.x*0.3) * abs(point.y*0.25+0.5)));
 	return max(b,-min(c, length(point) - 0.335));
@@ -32,7 +32,7 @@ func build_shader_code(shader: Shader, color: Vector3) -> void:
 	""")
 	
 	
-	add_group("""
+	add_group_3D("""
 	point.z = abs(point.z);
 	point -= vec3(-0.25, 0.0, 0.8);
 	float e = max(dot(vec2(0.2588190451, 0.96592582628).yx, vec2(length(point.yz),point.x)),-1.0-point.x);
@@ -52,7 +52,7 @@ func build_shader_code(shader: Shader, color: Vector3) -> void:
 	ALBEDO = vec3(""" +str(color.x)+","+str(color.y)+","+str(color.z)+ """) * 0.4 * normalize(vec3(""" + three_rng(0.5, 1.5) + """));
 	""")
 	
-	add_group("""
+	add_group_3D("""
 	float lp = length(point);
 	float sphere = length(lp) - 0.27;
 	float time = TIME*1.0 + 1.0;
@@ -70,18 +70,18 @@ func build_shader_code(shader: Shader, color: Vector3) -> void:
 	int a = int(ray_pos.x*100.0);
 	int b = int(ray_pos.y*100.0);
 	int c = int(ray_pos.z*100.0);
-	ALBEDO = vec3(0.3, 0.7, 1.0) * 0100.01 * abs(float(a^b + b^c + c^a));
+	ALBEDO = clamp(vec3(0.3, 0.7, 1.0) * 0100.01 * abs(float(a^b + b^c + c^a)), 0.0, 1.5);
 	""")
 	
-	shader.code = SDF_MAT_SDFS + "\n\n".join(sdfs) + generate_min_all(groups) + SDF_MAT_COLORS + "\n".join(colors) + SDF_FOOTER
+	shader.code = SDF_MAT_SDFS_3D + "\n\n".join(sdfs) + generate_min_all_3D(groups) + SDF_MAT_COLORS_3D + "\n".join(colors) + SDF_FOOTER_3D
 
 
-func add_group(sdf: String, color: String) -> void:
+func add_group_3D(sdf: String, color: String) -> void:
 	sdfs.append("float mat_group_" + str(groups) + "(vec3 point) {" + sdf.strip_edges() + "}")
-	colors.append(generate_color(groups, color.strip_edges()))
+	colors.append(generate_color_3D(groups, color.strip_edges()))
 	groups += 1
 
-static func generate_min_all(n: int) -> String:
+static func generate_min_all_3D(n: int) -> String:
 	if n <= 0: return "100.0"
 	return "\n\nfloat sdf_all( vec3 point ) { return " + recur_min_all(n, nearest_po2(n), 1) + ";}\n"
 
@@ -92,23 +92,29 @@ static func recur_min_all(max: int, c: int, o: int) -> String:
 		if o + c <= max: return "min(" + recur_min_all(max, c, o) + "," + recur_min_all(max, c, o + c) + ")"
 		else: return recur_min_all(max, c, o)
 
-static func generate_color(i: int, color: String) -> String:
+static func generate_color_3D(i: int, color: String) -> String:
 	return """
 	tst = mat_group_""" + str(i) + """(ray_pos); d = min(d, tst); if (tst <= FI) {
 	""" + color + """
 	break; }"""
 
-const SDF_MAT_SDFS := """shader_type spatial;
+static func generate_color_2D(i: int, color: String) -> String:
+	return """
+	d = mat_group_""" + str(i) + """(ray_pos); d = min(d, tst); if (tst <= FI) {
+	""" + color + """
+	break; }"""
+
+const SDF_MAT_SDFS_3D := """shader_type spatial;
 render_mode unshaded;
 #include "res://assets/shaders/raycast.gdshaderinc"
 #include "res://assets/shaders/sdf.gdshaderinc"
-const vec3 LIGHT_DIR = -normalize(vec3(-0.5, -1.5, 0.9));
+const vec3 LIGHT_DIR = -vec3(-0.5, -1.5, 0.9);
 const float FI = 0.005;
 instance uniform bool hurt = false;
 
 """
 
-const SDF_MAT_COLORS := """
+const SDF_MAT_COLORS_3D := """
 //const float h = 0.005;
 vec3 get_sdf_normal( vec3 point, float h ) {
 	return normalize(
@@ -140,15 +146,16 @@ void fragment() {
 		d = 500.0;
 		"""
 
-const SDF_FOOTER := """
+const SDF_FOOTER_3D := """
 	
 	t += d;
 	}; if (t > 8.0) discard;
 	
 	ray_pos = ray_org + ray_dir*t;
 	vec3 normal = get_sdf_normal(ray_pos, 0.001);
-	vec3 light_dir = (vec4(LIGHT_DIR, 1.0)*MODEL_MATRIX).xyz;
+	vec3 light_dir = normalize((vec4(LIGHT_DIR, 1.0) * MODEL_MATRIX).xyz);
 	float light_level = 0.75;
+	
 	
 	light_level *= max(dot(normal, light_dir), 0.0);
 	
