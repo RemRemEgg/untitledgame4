@@ -6,15 +6,15 @@ var style: int = 0
 var dir: Vector2
 var text: String
 
-static func instant(text: String, pos: Vector2, style: int = 0) -> TextPopup:
+static func instant(text_: String, pos: Vector2, style_: int = 0) -> TextPopup:
 	var pop: TextPopup = Global.SCN_TEXT_POPUP.instantiate() as TextPopup
-	(pop.get_child(0) as Label).text = text
-	pop.text = text
+	(pop.get_child(0) as Label).text = text_
+	pop.text = text_
 	pop.global_position = pos
-	pop.style = style
+	pop.style = style_
 	Global.Game.popups.add_child(pop)
 	
-	match style:
+	match style_:
 		0:
 			pop.modulate = Color(0.9, 0.5, 0.45, 1.0)
 			pop.dir = Vector2.LEFT.rotated(randf() * PI * 2)

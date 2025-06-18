@@ -9,8 +9,9 @@ var bonus_speed: float = 0.1
 var guns: Array[ProcGun] = []
 
 var sep_bias: float = 0.0
+var sep_dist: float = 0.0
 
-static func make() -> ProcEntity:
+static func make(difficulty: int, rng_seed: int) -> ProcEntity:
 	var pe := ProcEntity.new()
 	
 	pe.shader_mat = SDFBuilder.new().build_shader_3D(Vector3(randf(), randf(), randf()).normalized() * 7./5)
@@ -22,6 +23,7 @@ static func make() -> ProcEntity:
 	gun.fire_rate = 0.8
 	pe.guns.append(gun)
 	pe.sep_bias = (randf_range(0.0, 2.0)**2) / 4.2 + 0.05
+	pe.sep_dist = randf_range(100, 400)
 	
 	return pe
 
@@ -52,7 +54,7 @@ func process(entity: Entity, delta: float) -> void:
 	
 	
 	var tilt: Vector2 = entity.rotate_and_tilt(rotate, move, delta)
-	entity.move_and_bonus(move * (1.0 if dist > 250 else -0.48), -tilt.y, delta)
+	entity.move_and_bonus(move * (1.0 if dist > sep_dist else -0.5), -tilt.y, delta)
 	
 	entity.move_and_slide()
 	

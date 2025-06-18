@@ -62,7 +62,7 @@ func process(gun: Gun, entity: Entity, delta: float) -> void:
 				gun.fire_timer += delta * fire_rate
 				if gun.fire_timer >= 1.0: gun.fire_timer = -style_data_i
 
-func fire(gun: Gun, entity: Entity, delta: float) -> void:
+func fire(_gun: Gun, entity: Entity, delta: float) -> void:
 	process_modifier(entity.global_position + Vector2.RIGHT.rotated(entity.rotation) * 22.0, entity.rotation, 0, entity, delta)
 
 

@@ -20,6 +20,7 @@ extends RefCounted
 # movements modifiers
 # 
 
+var shader_mat: ShaderMaterial
 var psqp: PhysicsShapeQueryParameters2D
 
 var max_health: float = 4.0
@@ -32,10 +33,8 @@ var damage: float = 4.0
 static func make() -> ProcProj:
 	var pp: ProcProj = ProcProj.new()
 	
+	pp.shader_mat = SDFBuilder.new().build_shader_2D((Vector3(randf(), randf(), randf()) - Vector3(0.1, 0.1, 0.1)).normalized() * 7./12)
 	pp.psqp = PhysicsShapeQueryParameters2D.new()
-	pp.psqp.collide_with_areas = true
-	pp.psqp.collide_with_bodies = false
-	#psqp.collision_mask = Global.TEAM.PROJECTILE
 	var shape := CircleShape2D.new()
 	shape.radius = 4.0
 	pp.psqp.shape = shape
@@ -75,7 +74,7 @@ func process(proj: Projectile, delta: float) -> void:
 		psqp.transform = proj.global_transform
 		var hits := proj.get_world_2d().direct_space_state.intersect_shape(psqp)
 		for hit in hits:
-			var colc := hit["collider"].get_parent() as PhysicsBody2D
+			var colc := hit["collider"] as PhysicsBody2D
 			if colc is Entity: if !process_collision(proj, colc as Entity): return
 	
 	proj.mesh.global_position = Entity.up_dim(proj.global_position)

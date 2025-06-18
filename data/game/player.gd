@@ -36,12 +36,12 @@ class STAT: enum {
 	FOCUS, SPECIAL, ULTIMATE
 }
 static var STAT_NAMES: PackedStringArray = ["MDAMAGE", "SDAMAGE", "PIERCE", "HEALTH", "SHIELD", "VAMP", "CRITX", "CRITP", "EXECUTE", "STATEFF", "_dne", "MSFRATE", "FOCUS", "SPECIAL", "ULTIMATE"]
-static func string_to_stat(name: String) -> int: return STAT_NAMES.find(name)
+static func string_to_stat(name_: String) -> int: return STAT_NAMES.find(name_)
 
 
 
 func _ready() -> void:
-	ProcPlayer.make().bind(self)
+	ProcPlayer.make(0,0).bind(self)
 	
 	var steal := Global.SCN_ENTITY.instantiate() as Entity
 	mesh = steal.get_node("mesh")
@@ -55,7 +55,7 @@ func _ready() -> void:
 	state = 1
 
 class ProcPlayer extends ProcEntity:
-	static func make() -> ProcPlayer:
+	static func make(__, ___) -> ProcPlayer:
 		var pp := ProcPlayer.new()
 		
 		pp.shader_mat = SDFBuilder.new().build_shader_3D(Vector3(0.1, 0.5, 0.5))
@@ -72,20 +72,18 @@ class ProcPlayer extends ProcEntity:
 		sec_gun.proj = sec_proj
 		
 		main_gun.style = ProcGun.STYLE_GUN
-		main_gun.fire_rate = 14
-		main_gun.inaccuracy = 0.2
+		main_gun.fire_rate = 7
+		main_gun.inaccuracy = 0.12
 		main_proj.speed = 900.0
 		main_proj.damage = 1.0
 		
-		sec_gun.style = ProcGun.STYLE_REPEATER
+		sec_gun.style = ProcGun.STYLE_GUN
 		sec_gun.fire_rate = 0.7
-		sec_gun.style_data_i = 3
-		sec_gun.style_data_f = 100
 		sec_gun.add_modifier(ProcGun.MOD_DUAL, 12.0)
 		sec_gun.inaccuracy = 0.0
 		sec_proj.speed = 1600.0
-		sec_proj.damage = 2.0
-		sec_proj.depth = 1.0
+		sec_proj.damage = 4.0
+		sec_proj.depth = 3.0
 		
 		pp.guns.append(main_gun)
 		pp.guns.append(sec_gun)

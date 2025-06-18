@@ -21,6 +21,13 @@ func build_shader_3D(color: Vector3) -> ShaderMaterial:
 	mat.shader = shader
 	return mat
 
+func build_shader_2D(color: Vector3) -> ShaderMaterial:
+	var mat := ShaderMaterial.new()
+	var shader := Shader.new()
+	build_shader_code_2D(shader, color)
+	mat.shader = shader
+	return mat
+
 
 func build_shader_code_3D(shader: Shader, color: Vector3) -> void:
 	add_group_3D("""
@@ -73,7 +80,29 @@ func build_shader_code_3D(shader: Shader, color: Vector3) -> void:
 	ALBEDO = clamp(vec3(0.3, 0.7, 1.0) * 0100.01 * abs(float(a^b + b^c + c^a)), 0.0, 1.5);
 	""")
 	
-	shader.code = SDF_MAT_SDFS_3D + "\n\n".join(sdfs) + generate_min_all_3D(groups) + SDF_MAT_COLORS_3D + "\n".join(colors) + SDF_FOOTER_3D
+	shader.code = SDF_HEADER_3D + "\n\n".join(sdfs) + generate_min_all_3D(groups) + SDF_BODY_3D + "\n".join(colors) + SDF_FOOTER_3D
+
+func build_shader_code_2D(shader: Shader, color: Vector3) -> void:
+	var r_color := color.rotated(Vector3.ONE.normalized(), PI * (2./3))
+	add_group_2D("""
+	point.x *= 0.5;
+	return abs(point.y) + abs(point.x+0.1 - abs(point.y)*0.5) - 0.333;
+	""","""
+	d = floor(-d * 3.0 * 4.0) / 4.0;
+	albedo = vec3(""" +str(color.x)+","+str(color.y)+","+str(color.z)+ """) + vec3(""" +str(r_color.x)+","+str(r_color.y)+","+str(r_color.z)+ """) * d;
+	alpha = 1.0;
+	""")
+	
+	add_group_2D("""
+	point.x *= 0.5;
+	return abs(point.y) + abs(point.x+0.22 - abs(point.y)*0.5) - 0.5;
+	""","""
+	albedo = vec3(""" +str(color.x)+","+str(color.y)+","+str(color.z)+ """) + vec3(""" +str(r_color.x)+","+str(r_color.y)+","+str(r_color.z)+ """) * -d;
+	d *= -5.;
+	alpha = d / (d + 8.0);
+	""")
+	
+	shader.code = SDF_HEADER_2D + "\n\n".join(sdfs) + SDF_BODY_2D + "\n".join(colors) + SDF_FOOTER_2D
 
 
 func add_group_3D(sdf: String, color: String) -> void:
@@ -81,16 +110,21 @@ func add_group_3D(sdf: String, color: String) -> void:
 	colors.append(generate_color_3D(groups, color.strip_edges()))
 	groups += 1
 
+func add_group_2D(sdf: String, color: String) -> void:
+	sdfs.append("float mat_group_" + str(groups) + "(vec2 point) {" + sdf.strip_edges() + "}")
+	colors.append(generate_color_2D(groups, color.strip_edges()))
+	groups += 1
+
 static func generate_min_all_3D(n: int) -> String:
-	if n <= 0: return "100.0"
+	if n <= 0: return ""
 	return "\n\nfloat sdf_all( vec3 point ) { return " + recur_min_all(n, nearest_po2(n), 1) + ";}\n"
 
-static func recur_min_all(max: int, c: int, o: int) -> String:
+static func recur_min_all(m: int, c: int, o: int) -> String:
 	if c == 1: return "mat_group_" + str(o-1) + "(point)"
 	else:
 		c /= 2
-		if o + c <= max: return "min(" + recur_min_all(max, c, o) + "," + recur_min_all(max, c, o + c) + ")"
-		else: return recur_min_all(max, c, o)
+		if o + c <= m: return "min(" + recur_min_all(m, c, o) + "," + recur_min_all(m, c, o + c) + ")"
+		else: return recur_min_all(m, c, o)
 
 static func generate_color_3D(i: int, color: String) -> String:
 	return """
@@ -100,11 +134,11 @@ static func generate_color_3D(i: int, color: String) -> String:
 
 static func generate_color_2D(i: int, color: String) -> String:
 	return """
-	d = mat_group_""" + str(i) + """(ray_pos); d = min(d, tst); if (tst <= FI) {
+	d = mat_group_""" + str(i) + """(point); if (d < 0.0) {
 	""" + color + """
-	break; }"""
+	return; }"""
 
-const SDF_MAT_SDFS_3D := """shader_type spatial;
+const SDF_HEADER_3D := """shader_type spatial;
 render_mode unshaded;
 #include "res://assets/shaders/raycast.gdshaderinc"
 #include "res://assets/shaders/sdf.gdshaderinc"
@@ -114,7 +148,7 @@ instance uniform bool hurt = false;
 
 """
 
-const SDF_MAT_COLORS_3D := """
+const SDF_BODY_3D := """
 //const float h = 0.005;
 vec3 get_sdf_normal( vec3 point, float h ) {
 	return normalize(
@@ -170,4 +204,23 @@ const SDF_FOOTER_3D := """
 	ALBEDO *= clamp(light_level, 0.01, 1.05);
 	ALBEDO = 0.6 * (ALBEDO * ALBEDO + ALBEDO * 2.0);
 	if (hurt) ALBEDO = (vec3(1.0)*0.3 + ALBEDO) / 1.3;
+}"""
+
+
+const SDF_HEADER_2D := """shader_type spatial;
+"""
+
+const SDF_BODY_2D := """
+void render(out vec3 albedo, out float alpha, vec2 point) {
+float d = 0.0;
+"""
+
+const SDF_FOOTER_2D := """
+discard;
+}
+
+void fragment() {
+	vec2 pos = UV * vec2(4.0, 2.0) - vec2(2.5, 1.0);
+	render(ALBEDO, ALPHA, pos);
+	EMISSION = ALBEDO;
 }"""

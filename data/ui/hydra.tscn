@@ -1,9 +1,10 @@
 [gd_scene load_steps=3 format=3 uid="uid://dl1kfp6mi78sb"]
 
-[ext_resource type="Script" path="res://data/ui/hydra.gd" id="1_5uud0"]
+[ext_resource type="Script" uid="uid://0is5ybelmv1n" path="res://data/ui/hydra.gd" id="1_5uud0"]
 [ext_resource type="Theme" uid="uid://p45krgn8sxrr" path="res://data/ui/hydra.tres" id="2_koqqg"]
 
 [node name="hydra" type="CanvasLayer"]
+layer = 127
 script = ExtResource("1_5uud0")
 
 [node name="neck" type="GridContainer" parent="."]

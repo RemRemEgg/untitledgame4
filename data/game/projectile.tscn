@@ -8,7 +8,6 @@ render_priority = 0
 shader = ExtResource("2_t70da")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_bojni"]
-material = SubResource("ShaderMaterial_f3vgd")
 size = Vector2(4, 2)
 center_offset = Vector3(-0.5, 0, 0)
 
@@ -21,6 +20,7 @@ height = 0.01
 script = ExtResource("1_c5sjs")
 
 [node name="mesh" type="MeshInstance3D" parent="."]
+material_override = SubResource("ShaderMaterial_f3vgd")
 mesh = SubResource("PlaneMesh_bojni")
 
 [node name="mesh_instance_3d" type="MeshInstance3D" parent="mesh"]

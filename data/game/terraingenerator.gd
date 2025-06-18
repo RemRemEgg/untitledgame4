@@ -22,18 +22,18 @@ func plane(_size: Vector2i) -> TerrainGenerator:
 	
 	for y in range(size.y):
 		for x in range(size.x):
-			var index := x + (y*size.x)
+			var i := x + (y*size.x)
 			var vert := Vector3(x-size.x/2.0, 0, y-size.y/2.0)
 			verts.append(vert)
 			normals.append(vert.normalized())
 			uvs.append(Vector2(0, 0))
 			if x != 0 && y != 0:
-				indices.append(index)
-				indices.append(index-1)
-				indices.append(index-size.x)
-				indices.append(index-1)
-				indices.append(index-size.x-1)
-				indices.append(index-size.x)
+				indices.append(i)
+				indices.append(i-1)
+				indices.append(i-size.x)
+				indices.append(i-1)
+				indices.append(i-size.x-1)
+				indices.append(i-size.x)
 	return self
 
 func build_surface_array() -> TerrainGenerator:

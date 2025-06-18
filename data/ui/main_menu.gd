@@ -44,8 +44,7 @@ func _settings_pressed() -> void:
 	set_depth(1)
 	menus.add_child(settings)
 
-func _save_file_pressed(id: int) -> void:
-	#print("sf", id)
+func _save_file_pressed(_id: int) -> void:
 	get_tree().change_scene_to_file("res://data/ui/game_menu.tscn")
 
 

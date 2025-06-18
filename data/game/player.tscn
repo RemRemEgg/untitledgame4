@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://ccy2rg71tsfn7"]
+[gd_scene load_steps=4 format=3 uid="uid://ccy2rg71tsfn7"]
 
 [ext_resource type="Script" uid="uid://cj2dsyscpjdat" path="res://data/game/player.gd" id="1_fmkbh"]
 
@@ -8,31 +8,20 @@ radius = 16.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_sjkq4"]
 radius = 22.0
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_eifl0"]
-radius = 12.0
-
 [node name="player" type="CharacterBody2D"]
-collision_layer = 17
-collision_mask = 27
+collision_layer = 81
+collision_mask = 11
 motion_mode = 1
 script = ExtResource("1_fmkbh")
 
-[node name="collision_shape_2d" type="CollisionShape2D" parent="."]
+[node name="collider" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_1eefc")
 debug_color = Color(1, 1, 1, 0.42)
 
-[node name="static_body_2d" type="StaticBody2D" parent="."]
+[node name="pusher" type="StaticBody2D" parent="."]
 collision_layer = 32
 collision_mask = 0
 
-[node name="collision_shape_2d" type="CollisionShape2D" parent="static_body_2d"]
+[node name="collider" type="CollisionShape2D" parent="pusher"]
 shape = SubResource("CircleShape2D_sjkq4")
 debug_color = Color(0.184314, 0.580392, 0.113725, 0.643137)
-
-[node name="hurtbox" type="Area2D" parent="."]
-collision_layer = 4
-collision_mask = 0
-
-[node name="collision_shape_2d" type="CollisionShape2D" parent="hurtbox"]
-shape = SubResource("CircleShape2D_eifl0")
-debug_color = Color(0, 0.636, 0.408, 0.152)

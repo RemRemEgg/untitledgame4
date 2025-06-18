@@ -71,7 +71,9 @@ text = "Level"
 
 [node name="spin_box" type="SpinBox" parent="margin_container/flow_container"]
 layout_mode = 2
+min_value = 1.0
 max_value = 8.0
+value = 1.0
 rounded = true
 
 [node name="start_game" type="Button" parent="margin_container/flow_container"]

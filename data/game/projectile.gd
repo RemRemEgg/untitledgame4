@@ -16,6 +16,7 @@ var health: float = 20.0
 
 func _ready() -> void:
 	mesh = $mesh as Node3D
+	mesh.material_override = proc.shader_mat
 	remove_child(mesh)
 	Global.Game.render.add_child(mesh)
 	mesh.global_position = Entity.up_dim(global_position)

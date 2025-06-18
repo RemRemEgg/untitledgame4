@@ -1,6 +1,11 @@
 class_name GameRunner
 extends Node
 
+
+static var ENTITIES: Array[ProcEntity]
+static var RNG: RandomNumberGenerator
+
+
 @onready var vp: SubViewportContainer = $vp as SubViewportContainer
 @onready var sub_vp: SubViewport = vp.get_node("sub_vp") as SubViewport
 
@@ -18,8 +23,6 @@ extends Node
 @onready var popups: Control = world_control.get_node("popups") as Control
 
 var player: Player
-var proc_entities: Array[ProcEntity] = []
-var proc_count := 0
 
 func _enter_tree() -> void:
 	Global.Game = self
@@ -41,11 +44,11 @@ func _ready() -> void:
 
 var wave_delay: float = 1.0
 var wave_total: int
-var wave_count: int = 1
+var wave_count: int = 8
 
 
 func _process(delta: float) -> void:
-	for proce in proc_entities: proce.preprocess()
+	for proce in ENTITIES: proce.preprocess()
 	Entity.CENTER = Vector2(Entity.CENTER_AVG.x, Entity.CENTER_AVG.y) / Entity.CENTER_AVG.z
 	if Entity.CENTER_AVG.z == 0: Entity.CENTER = Vector2.ZERO
 	Entity.CENTER_AVG = Vector3.ZERO
@@ -55,25 +58,21 @@ func _process(delta: float) -> void:
 		wave_delay = 15
 		wave_total += 4
 		wave_count -= 1
+		if wave_count == 0:
+			Hydra._TEMP_make_miniboss(player.position.normalized() * 2400)
 	
 	while wave_total > 0:
 		wave_total -= 1
-		spawn_enemy()
+		var pos: Vector2 = player.position
+		while pos.distance_squared_to(player.position) < 1200**2: pos = Vector2.LEFT.rotated(randf() * PI * 2) * 2400
+		create_enemy(pos)
 
 
-
-func spawn_enemy() -> void:
-	if proc_count % int(3**proc_entities.size() + 1) == 0:
-		proc_entities.append(ProcEntity.make())
-	proc_count += 1
-	var pos: Vector2 = player.position
-	while pos.distance_squared_to(player.position) < 1200**2: pos = Vector2.LEFT.rotated(randf() * PI * 2) * 2400
-	create_enemy(pos)
 
 func create_enemy(pos: Vector2) -> void:
 	var enemy := Global.SCN_ENTITY.instantiate() as Entity
 	enemy.global_position = pos
-	proc_entities[randi_range(0, proc_entities.size()-1)].bind(enemy)
+	ENTITIES[clampi(int(randfn(ENTITIES.size()/3.0, ENTITIES.size()/2.0)), 0, ENTITIES.size()-1)].bind(enemy)
 	Global.Game.entities.add_child(enemy)
 
 

@@ -19,7 +19,7 @@ func _ready() -> void:
 	var heal := HydraHead.make("Heal", func()->void: Global.Game.player.health = 1000000)
 	var spawn_enemy := HydraHead.make("Spawn Enemy", func()->void: Global.Game.create_enemy(Global.Game.player.get_global_mouse_position()))
 	var teleport := HydraHead.make("Teleport", func()->void: Global.Game.player.position = Global.Game.player.get_global_mouse_position())
-	var _TEMP_miniboss := HydraHead.make("Miniboss", _TEMP_make_miniboss)
+	var _TEMP_miniboss := HydraHead.make("Miniboss", func()->void:_TEMP_make_miniboss(Global.Game.player.get_global_mouse_position()))
 	
 	
 	var kill_all := HydraHead.make("Kill All", func()->void: for e in Global.Game.entities.get_children(): if e is Entity: (e as Entity).kill())
@@ -30,7 +30,7 @@ func _ready() -> void:
 	set_active_neck(root)
 
 
-func _TEMP_make_miniboss() -> void:
+func _TEMP_make_miniboss(pos: Vector2) -> void:
 	var pe := ProcEntity.new()
 	
 	var iks := randi()
@@ -80,7 +80,7 @@ func _TEMP_make_miniboss() -> void:
 	pe.sep_bias = 0.0
 	
 	var enemy := Global.SCN_ENTITY.instantiate() as Entity
-	enemy.global_position = Global.Game.player.get_global_mouse_position()
+	enemy.global_position = pos
 	pe.bind(enemy)
 	Global.Game.entities.add_child(enemy)
 	
@@ -126,7 +126,7 @@ func update(delta: float) -> void:
 	auto_timer += delta
 	if vec.length_squared() < 38**2: auto_timer = 0
 	
-	var i := (clampi(roundi(vec.x/(68/1)), -1, 1)+1) + (clampi(roundi(vec.y/(68/1)), -1, 1)+1)*3
+	var i := (clampi(roundi(vec.x/(68./1)), -1, 1)+1) + (clampi(roundi(vec.y/(68./1)), -1, 1)+1)*3
 	if i < 0 || i > 8: return
 	i = SELECTION_ORDER[i]
 	if auto_selection == i:
@@ -143,7 +143,7 @@ func execute() -> void:
 	var vec := ct_neck.get_global_mouse_position() - ct_neck.global_position - HALF_SIZE
 	if vec.length_squared() < 38**2: return
 	
-	var i := (clampi(roundi(vec.x/(68/1)), -1, 1)+1) + (clampi(roundi(vec.y/(68/1)), -1, 1)+1)*3
+	var i := (clampi(roundi(vec.x/(68./1)), -1, 1)+1) + (clampi(roundi(vec.y/(68./1)), -1, 1)+1)*3
 	if i < 0 || i > 8: return
 	i = SELECTION_ORDER[i]
 	if i >= 0 && i < neck.parts.size():
