@@ -70,18 +70,16 @@ func _process(delta: float) -> void:
 
 
 func create_enemy(pos: Vector2) -> void:
-	var enemy := Global.SCN_ENTITY.instantiate() as Entity
+	var idx := clampi(int(randfn(ENTITIES.size()/3.0, ENTITIES.size()/2.0)), 0, ENTITIES.size()-1)
+	var enemy := ENTITIES[idx].create_entity().add_to_world()
 	enemy.global_position = pos
-	ENTITIES[clampi(int(randfn(ENTITIES.size()/3.0, ENTITIES.size()/2.0)), 0, ENTITIES.size()-1)].bind(enemy)
-	Global.Game.entities.add_child(enemy)
+	
 
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		var eiemb := event as InputEventMouseButton
 		match eiemb.button_index:
-			#1 when eiemb.pressed: spawn_enemy()
-			#2 when eiemb.pressed: for c in Global.Game.entities.get_children(): c.kill()
 			3 when eiemb.pressed: player.global_position = player.get_global_mouse_position()
 			4 when eiemb.pressed: Engine.time_scale += 0.5
 			5 when eiemb.pressed: Engine.time_scale -= 0.5

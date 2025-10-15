@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://45y566yeigas"]
+[gd_scene load_steps=8 format=3 uid="uid://45y566yeigas"]
 
 [ext_resource type="Script" uid="uid://bl0vprje14lka" path="res://data/game/sdf_builder.gd" id="1_segsh"]
 [ext_resource type="Shader" uid="uid://3gqyohrvoefk" path="res://assets/shaders/sdf_test.gdshader" id="2_ngple"]
@@ -11,6 +11,16 @@ shader = ExtResource("2_ngple")
 material = SubResource("ShaderMaterial_l70t0")
 size = Vector2(6, 6)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ngsuu"]
+transparency = 1
+albedo_color = Color(0, 1, 1, 0.427451)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ob2dm"]
+material = SubResource("StandardMaterial3D_ngsuu")
+top_radius = 1.667
+bottom_radius = 0.0
+height = 0.001
+
 [sub_resource type="PlaneMesh" id="PlaneMesh_ob2dm"]
 material = SubResource("ShaderMaterial_l70t0")
 size = Vector2(6, 6)
@@ -20,6 +30,9 @@ script = ExtResource("1_segsh")
 
 [node name="mesh_instance_3d" type="MeshInstance3D" parent="."]
 mesh = SubResource("PlaneMesh_ngsuu")
+
+[node name="mesh_instance_3d" type="MeshInstance3D" parent="mesh_instance_3d"]
+mesh = SubResource("CylinderMesh_ob2dm")
 
 [node name="mesh_instance_3d_2" type="MeshInstance3D" parent="."]
 transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 100, 42.8806, 0, 15.9175)
@@ -31,6 +44,5 @@ transform = Transform3D(-1, 6.68715e-08, -5.63111e-08, 0, 0.644124, 0.764921, 8.
 fov = 45.0
 
 [node name="color_rect" type="ColorRect" parent="camera_3d"]
-visible = false
 offset_right = 40.0
 offset_bottom = 40.0

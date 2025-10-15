@@ -17,11 +17,11 @@ func start_game_pressed() -> void:
 	var ents: Array[ProcEntity] = []
 	
 	for i in 5:
-		var ent := ProcEntity.make(i, rng.randi())
+		var ent := ProcEntity.create(i, rng.randi())
 		ents.append(ent)
 	
 	GameRunner.ENTITIES = ents
 	GameRunner.RNG = RandomNumberGenerator.new()
 	GameRunner.RNG.seed = randi()
 	
-	get_tree().change_scene_to_file("res://data/game/gamerunner.tscn")
+	Limbo.goto(Limbo.GAME_START)

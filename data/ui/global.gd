@@ -11,16 +11,10 @@ var load_call: Callable
 
 static var Game: GameRunner
 
-static var DEBUG: bool = false
+static var DEBUG: bool = true
 static var SCN_PLAYER: PackedScene
 static var SCN_ENTITY: PackedScene
-static var SCN_PROJECTILE: PackedScene
 static var SCN_TEXT_POPUP: PackedScene
-
-class TEAM:
-	const FRIENDLY: int = 0x0000_0001
-	const HOSTILE: int = 0x0000_0010
-	const PROJECTILE: int = 0x0100_0000
 
 func _ready() -> void:
 	lines = $margin/vbox/lines as RichTextLabel
@@ -38,7 +32,7 @@ func _process(_delta: float) -> void:
 		#3: attempt_load(Server.load_resources, "Loading Server Resources")
 		#6: attempt_load(ProcItem.register_all, "Loading Static Items")
 		9: attempt_load(self.cleanup, "Loading R.E.M. Core")
-		12: attempt_load(func(): get_tree().change_scene_to_file.call_deferred("res://data/ui/main_menu.tscn"), "Starting Main Menu...")
+		12: attempt_load(func():Limbo.goto.call_deferred(Limbo.MAIN_MENU), "Starting Main Menu...")
 
 func attempt_load(load_step: Callable, load_id: String) -> void:
 	self.print(load_id)
@@ -52,7 +46,6 @@ func cleanup() -> void:
 func load_resources() -> void:
 	SCN_PLAYER = load("res://data/game/player.tscn") as PackedScene
 	SCN_ENTITY = load("res://data/game/entity.tscn") as PackedScene
-	SCN_PROJECTILE = load("res://data/game/projectile.tscn") as PackedScene
 	SCN_TEXT_POPUP = load("res://data/ui/text_popup.tscn") as PackedScene
 	load_status += 1 +3+3
 
@@ -109,6 +102,8 @@ func run_command(args: Array[String]) -> void:
 	hit_error = false
 	if args.size() == 0: return
 	match args[0]:
+		"help":
+			self.print("fps [target]\n*stat_mod <stat> <level>\n*gun <style>")
 		"fps":
 			if args.size() < 2: return self.print(" > FPS target: %s (%s mspt), Running: %s" % ["uncapped" if Engine.max_fps == 0 else str(Engine.max_fps),round(1000.0/Engine.max_fps),Engine.get_frames_per_second()])
 			Engine.max_fps = int(args[1])

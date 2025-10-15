@@ -41,86 +41,75 @@ static func string_to_stat(name_: String) -> int: return STAT_NAMES.find(name_)
 
 
 func _ready() -> void:
-	ProcPlayer.make(0,0).bind(self)
+	proc = ProcPlayer.create(0,0)
 	
-	var steal := Global.SCN_ENTITY.instantiate() as Entity
-	mesh = steal.get_node("mesh")
-	mesh.get_parent().remove_child(mesh)
-	steal.queue_free()
-	mesh.owner = null
-	mesh.material_override = proc.shader_mat
+	mesh = MeshInstance3D.new()
 	Global.Game.render.add_child(mesh)
+	mesh.mesh = proc.mesh
+	team = proc.team
+	collision_layer |= ~team & 0b1111
 	
-	#($hurtbox as Area2D).body_entered.connect(_hurtbox_hit)
-	state = 1
+	health = 100000
+	guns = []
+	guns.resize(proc.guns.size())
+	for i in guns.size(): guns[i] = Gun.new()
 
 class ProcPlayer extends ProcEntity:
-	static func make(__, ___) -> ProcPlayer:
+	static func create(__, ___) -> ProcPlayer:
 		var pp := ProcPlayer.new()
+		pp.team = 0b0001
 		
-		pp.shader_mat = SDFBuilder.new().build_shader_3D(Vector3(0.1, 0.5, 0.5))
+		pp.shader_mat = SDFBuilder.new().build_shader_3D(Vector3(randf(), randf(), randf()).normalized() * 7./5)
+		var mesh_ := PlaneMesh.new()
+		mesh_.size = Vector2(6.0, 6.0)
+		pp.mesh = mesh_
+		pp.mesh.material = pp.shader_mat
 		
-		pp.rot_speed = 4.8
-		pp.speed = 850.0
-		
-		var main_gun: ProcGun = ProcGun.make()
-		var main_proj: ProcProj = ProcProj.make()
+		var main_gun: ProcGun = ProcGun.create()
+		var main_proj: ProcProj = ProcProj.create()
 		main_gun.proj = main_proj
 		
-		var sec_gun: ProcGun = ProcGun.make()
-		var sec_proj: ProcProj = ProcProj.make()
+		var sec_gun: ProcGun = ProcGun.create()
+		var sec_proj: ProcProj = ProcProj.create()
 		sec_gun.proj = sec_proj
 		
 		main_gun.style = ProcGun.STYLE_GUN
 		main_gun.fire_rate = 7
 		main_gun.inaccuracy = 0.12
+		main_gun.front_dist = 14.0
 		main_proj.speed = 900.0
 		main_proj.damage = 1.0
+		#main_proj.add_modifier(ProcProj.MOD_SIN, [20.0])
 		
 		sec_gun.style = ProcGun.STYLE_GUN
 		sec_gun.fire_rate = 0.7
-		sec_gun.add_modifier(ProcGun.MOD_DUAL, 12.0)
+		sec_gun.add_modifier(ProcGun.MOD_LINE, [2, 16.0])
 		sec_gun.inaccuracy = 0.0
+		sec_gun.front_dist = 12.0
 		sec_proj.speed = 1600.0
 		sec_proj.damage = 4.0
 		sec_proj.depth = 3.0
+		sec_proj.add_modifier(ProcProj.MOD_DECELERATE, [1.0])
 		
 		pp.guns.append(main_gun)
 		pp.guns.append(sec_gun)
 		
-		#var temp_gun := ProcGun.make()
-		#var temp_proj := ProcProj.make()
-		#temp_gun.proj = temp_proj
-		#temp_gun.style = ProcGun.STYLE_GUN
-		#temp_gun.fire_rate = 1.0
-		#temp_gun.inaccuracy = 0.0
-		#temp_proj.speed = 900
-		#temp_proj.damage = 1.0
-		#temp_proj.depth = 10
-		#pp.guns.append(temp_gun)
-		
+		pp.rot_speed = 4.8
+		pp.speed = 850.0
 		
 		return pp
 	
-	func bind(entity: Entity) -> void:
-		var player := entity as Player
-		player.proc = self
-		player.team = Global.TEAM.FRIENDLY
-		player.health = 100000
-		player.guns = []
-		player.guns.resize(guns.size())
-		
-		player.guns = []
-		player.guns.resize(guns.size())
-		for i in guns.size(): player.guns[i] = Gun.new()
-	
-	
-	func process(entity: Entity, delta: float) -> void:
-		var player := entity as Player
+	func process(ent: Entity, delta: float) -> void:
+		var player := ent as Player
 		var move := Input.get_vector(&"left", &"right", &"up", &"down")
 		var tilt: Vector2 = player.rotate_and_tilt(player.get_global_mouse_position() - player.global_position, move, delta)
 		player.move_and_bonus(move, (400.0 if Input.is_action_pressed("boost") else 0.0)-tilt.y, delta)
 		
 		player.move_and_slide()
 		
-		for i in guns.size(): guns[i].process(player.guns[i], player, delta)
+		for i in guns.size(): guns[i].process(player.guns[i], player.global_transform, player, delta)
+		
+		ent.mesh.global_position = Entity.up_dim(ent.global_position)
+		ent.mesh.rotation = Vector3(lerpf(ent.mesh.rotation.x, ent.rotlerp.x, delta*3), -ent.rotation, lerpf(ent.mesh.rotation.z, ent.rotlerp.y, delta*5))
+		ent.hurt_time -= delta
+		if ent.hurt_time < 0: ent.mesh.set_instance_shader_parameter("hurt", false)

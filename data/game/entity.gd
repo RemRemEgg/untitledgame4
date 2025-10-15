@@ -4,11 +4,8 @@ extends CharacterBody2D
 static func up_dim(v_in: Vector2) -> Vector3: return Vector3(v_in.x, 0, v_in.y) / 12.0
 static func down_dim(v_in: Vector3) -> Vector2: return Vector2(v_in.x, v_in.z) * 12.0
 
-static var DAMAGE_DATA: Array[float] = [0.0]
 static var CENTER: Vector2 = Vector2.ZERO
 static var CENTER_AVG: Vector3 = Vector3.ZERO
-
-
 
 func rotate_and_tilt(rot: Vector2, tilt: Vector2, delta: float) -> Vector2:
 	var agt := global_transform.x.angle_to(rot)
@@ -27,58 +24,48 @@ func move_and_bonus(move: Vector2, bonus_move_: float, delta: float) -> void:
 var proc: ProcEntity
 var target: Entity
 
+var coll: CollisionShape2D
 var mesh: MeshInstance3D
 var rotlerp: Vector2
 var hurt_text: TextPopup
 var team: int = 0x0
-var state: int = 0
+
+var atk_data: Array[float]
+var curr_atk: ProcEntity.AtkExecutor
+var move_dir: Vector2
+var update_timer: float
 
 var guns: Array[Gun]
 
 var health: float = 60.0
 var hurt_time: float = 0.0
 
-func _ready() -> void:
-	mesh = $mesh as MeshInstance3D
-	mesh.material_override = proc.shader_mat
-	#($hurtbox as Area2D).body_entered.connect(_hurtbox_hit)
-	remove_child(mesh)
+
+static func create() -> Entity:
+	var ent := Global.SCN_ENTITY.instantiate() as Entity
+	ent.coll = ent.get_child(0) as CollisionShape2D
+	ent.mesh = ent.get_child(1) as MeshInstance3D
+	ent.remove_child(ent.mesh)
+	return ent
+func add_to_world() -> Entity:
+	mesh.owner = null ##??TODO
 	Global.Game.render.add_child(mesh)
-	state = 1
+	Global.Game.entities.add_child(self)
+	return self
+
 
 func _process(delta: float) -> void:
-	if state != 1: return
 	proc.process(self, delta)
-	
-	mesh.global_position = up_dim(global_position)
-	mesh.rotation = Vector3(lerpf(mesh.rotation.x, rotlerp.x, delta*3), -rotation, lerpf(mesh.rotation.z, rotlerp.y, delta*5))
-	
-	hurt_time -= delta
-	if hurt_time < 0: mesh.set_instance_shader_parameter("hurt", false)
+	queue_redraw()
 
+func _draw() -> void:
+	if !Global.DEBUG: return
+	draw_line(Vector2.ZERO, global_transform.basis_xform_inv(velocity*0.2), Color.RED, 2.0)
+	draw_line(Vector2.ZERO, global_transform.basis_xform_inv(move_dir*50.0), Color.GREEN, 2.0)
 
-
-func _hurtbox_hit(body: Node2D) -> void:
-	if body is Projectile:
-		var proj := body as Projectile
-		proj._process_collision(self)
-
-func _process_damage() -> float:
-	health -= DAMAGE_DATA[0]
-	
-	if hurt_text && is_instance_valid(hurt_text) && hurt_text.time < 0.25 && (hurt_text.position - global_position).length_squared() < 100025.0:
-		DAMAGE_DATA[0] += float(hurt_text.text)
+func popup_update(damage: float) -> void:
+	if hurt_text && is_instance_valid(hurt_text) && hurt_text.time < 1.0 && hurt_text.global_position.distance_squared_to(global_position) < 256**2:
+		damage += int(hurt_text.text)
 		hurt_text.queue_free()
-	hurt_text = TextPopup.instant(str(DAMAGE_DATA[0]), global_position)
-	hurt_time = 0.07
-	mesh.set_instance_shader_parameter("hurt", true)
-	
-	if health <= 0.0: kill()
-	return clamp((DAMAGE_DATA[0] + health) / DAMAGE_DATA[0], 0.0, 1.0)
-
-func kill() -> void:
-	if state == 2: return
-	state = 2
-	mesh.get_parent().remove_child(mesh)
-	mesh.queue_free()
-	queue_free()
+	var apos: Vector2 = self.global_position + Vector2(0.0, -8)
+	hurt_text = TextPopup.instant(str(int(damage)), Vector2(apos.x, apos.y)) as TextPopup

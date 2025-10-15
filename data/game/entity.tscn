@@ -1,17 +1,6 @@
-[gd_scene load_steps=11 format=3 uid="uid://brdvu35yxiufs"]
+[gd_scene load_steps=7 format=3 uid="uid://brdvu35yxiufs"]
 
 [ext_resource type="Script" uid="uid://b51hwk3k3j0c7" path="res://data/game/entity.gd" id="1_bjef8"]
-[ext_resource type="Shader" uid="uid://3gqyohrvoefk" path="res://assets/shaders/sdf_test.gdshader" id="2_uukyg"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_m8rj6"]
-radius = 20.0
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_l70t0"]
-render_priority = 0
-shader = ExtResource("2_uukyg")
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_bjef8"]
-size = Vector2(6, 6)
 
 [sub_resource type="Curve" id="Curve_5e4ec"]
 _limits = [0.0, 3.0, 0.0, 1.0]
@@ -43,19 +32,15 @@ material = SubResource("StandardMaterial3D_75ki6")
 size = Vector3(0.2, 0.2, 0.2)
 
 [node name="entity" type="CharacterBody2D"]
-collision_layer = 98
-collision_mask = 9
+collision_layer = 1024
+collision_mask = 768
 motion_mode = 1
 script = ExtResource("1_bjef8")
 
 [node name="collider" type="CollisionShape2D" parent="."]
-shape = SubResource("CircleShape2D_m8rj6")
 debug_color = Color(0, 0.554097, 0.90918, 0.42)
 
 [node name="mesh" type="MeshInstance3D" parent="."]
-material_override = SubResource("ShaderMaterial_l70t0")
-instance_shader_parameters/hurt = false
-mesh = SubResource("PlaneMesh_bjef8")
 
 [node name="particles" type="GPUParticles3D" parent="mesh"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.47745, 0, 0)

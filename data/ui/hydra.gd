@@ -22,7 +22,7 @@ func _ready() -> void:
 	var _TEMP_miniboss := HydraHead.make("Miniboss", func()->void:_TEMP_make_miniboss(Global.Game.player.get_global_mouse_position()))
 	
 	
-	var kill_all := HydraHead.make("Kill All", func()->void: for e in Global.Game.entities.get_children(): if e is Entity: (e as Entity).kill())
+	var kill_all := HydraHead.make("Kill All", func()->void: for e in Global.Game.entities.get_children(): if e is Entity: (e as Entity).proc.destroy_entity(e as Entity))
 	var boost_neck := HydraNeck.make("Boost", [kill_all])
 	
 	root = HydraNeck.make("root", [heal, spawn_enemy, teleport, PASS, boost_neck, _TEMP_miniboss])
@@ -31,62 +31,98 @@ func _ready() -> void:
 
 
 func _TEMP_make_miniboss(pos: Vector2) -> void:
-	var pe := ProcEntity.new()
+	var pe := ProcEntity.create(0, 0)
 	
 	var iks := randi()
 	seed(15973)
 	pe.shader_mat = SDFBuilder.new().build_shader_3D(Vector3(1.1, 0.2, 1.5))
-	seed(iks)
+	pe.mesh.material = pe.shader_mat
 	
 	
-	
-	var proj: ProcProj = ProcProj.make()
+	seed(15000)
+	var proj: ProcProj = ProcProj.create()
 	proj.speed = 600.0
-	var main := ProcGun.make()
-	main.proj = proj
-	main.fire_rate = 2.0
-	main.add_modifier(ProcGun.MOD_SPREAD, 3.0)
-	pe.guns.append(main)
+	var shotgun := ProcGun.create()
+	shotgun.proj = proj
+	shotgun.fire_rate = 2.0
+	shotgun.front_dist = 110.0
+	shotgun.add_modifier(ProcGun.MOD_SHOTGUN, [16.0, 0.35])
 	
-	var sproj: ProcProj = ProcProj.make()
-	sproj.speed = 1000.0
+	seed(25000)
+	var sproj: ProcProj = ProcProj.create()
+	sproj.speed = 800.0
 	sproj.damage = 0.5
-	var sec := ProcGun.make()
-	sec.proj = sproj
-	sec.style = ProcGun.STYLE_REPEATER
-	sec.fire_rate = 1./10
-	sec.style_data_f = 30
-	sec.style_data_i = 30*5
-	sec.add_modifier(ProcGun.MOD_DUAL, 22)
-	pe.guns.append(sec)
+	var duals := ProcGun.create()
+	duals.proj = sproj
+	duals.style = ProcGun.STYLE_REPEATER
+	duals.fire_rate = 1.0
+	duals.style_data_f = 30
+	duals.style_data_i = 30*5
+	duals.front_dist = 120.0
+	duals.inaccuracy = 0.1
+	duals.add_modifier(ProcGun.MOD_LINE, [2, 75])
 	
-	var bproj: ProcProj = ProcProj.make()
-	bproj.speed = 250.0
+	seed(20000)
+	var bproj: ProcProj = ProcProj.create()
+	bproj.speed = 50.0
 	bproj.damage = 100
-	bproj.scale = 5.0
-	bproj.max_health = 12.0
-	var burst := ProcGun.make()
+	bproj.scale = 7.0
+	bproj.shape.radius *= bproj.scale
+	bproj.health = 30.0
+	bproj.add_modifier(ProcProj.MOD_ACCELERATE, [2.5])
+	bproj.add_modifier(ProcProj.MOD_SIN, [2.0])
+	var burst := ProcGun.create()
 	burst.proj = bproj
-	burst.fire_rate = 1./15
-	burst.add_modifier(ProcGun.MOD_SURROUND, 12)
-	burst.add_modifier(ProcGun.MOD_DUAL, 24)
-	burst.add_modifier(ProcGun.MOD_DUAL, 12)
+	burst.fire_rate = 1.0
+	burst.front_dist = 0.0
+	burst.add_modifier(ProcGun.MOD_SURROUND, [20])
+	burst.add_modifier(ProcGun.MOD_LINE, [4, 32])
 	pe.guns.append(burst)
 	
+	var patt := ProcEntity.AtkPattern.new()
+	patt.style = ProcEntity.AtkPattern.STYLE_CYCLE
 	
-	pe.speed = 250
+	var exe_shotgun := ProcEntity.AtkExecutor.create()
+	exe_shotgun.gun = shotgun
+	exe_shotgun.fire_count = 10
+	patt.attacks.append(exe_shotgun)
+	var exe_duals := ProcEntity.AtkExecutor.create()
+	exe_duals.gun = duals
+	exe_duals.fire_count = 30*5
+	patt.attacks.append(exe_duals)
+	var exe_burst := ProcEntity.AtkExecutor.create()
+	exe_burst.gun = burst
+	exe_burst.fire_count = 1
+	exe_burst.cooldown = 4.0
+	patt.attacks.append(exe_burst)
+	
+	pe.atk = patt
+	pe.guns = []
+	pe.atk.finalize(pe)
+	
+	
+	pe.health = 1800
+	pe.scale = 110.0
+	(pe.coll as CircleShape2D).radius = pe.scale
+	pe.speed = 220
 	pe.bonus_speed = 0.75
 	pe.rot_speed = 1.5
-	pe.sep_bias = 0.0
+	pe.sep_bias = 0.05
+	pe.sep_dist = 200
 	
-	var enemy := Global.SCN_ENTITY.instantiate() as Entity
+	#var enemy := Global.SCN_ENTITY.instantiate() as Entity
+	#enemy.global_position = pos
+	#pe.bind(enemy)
+	#Global.Game.entities.add_child(enemy)
+	
+	var enemy := pe.create_entity()
 	enemy.global_position = pos
-	pe.bind(enemy)
-	Global.Game.entities.add_child(enemy)
+	enemy.add_to_world()
+	seed(iks)
 	
-	enemy.health = 1800
-	enemy.scale *= 4.0
-	enemy.mesh.scale *= 4.0
+	#enemy.health = 1800
+	#enemy.scale *= 4.0
+	#enemy.mesh.scale *= 4.0
 
 
 

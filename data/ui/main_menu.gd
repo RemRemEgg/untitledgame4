@@ -1,7 +1,5 @@
 extends Control
 
-
-
 @onready var menus: HBoxContainer = $margin/menus as HBoxContainer
 
 @onready var title: VBoxContainer = $margin/menus/title as VBoxContainer
@@ -11,9 +9,6 @@ extends Control
 @onready var start_game: Button = $margin/menus/title/start_game as Button
 @onready var sdf_test: Button = $margin/menus/title/sdf_test as Button
 @onready var settings_btn: Button = $margin/menus/title/settings as Button
-
-
-
 
 
 func _ready() -> void:
@@ -45,7 +40,7 @@ func _settings_pressed() -> void:
 	menus.add_child(settings)
 
 func _save_file_pressed(_id: int) -> void:
-	get_tree().change_scene_to_file("res://data/ui/game_menu.tscn")
+	Limbo.goto(Limbo.GAME_MENU)
 
 
 func _sdf_test() -> void:

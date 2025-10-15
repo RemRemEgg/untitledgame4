@@ -9,8 +9,8 @@ radius = 16.0
 radius = 22.0
 
 [node name="player" type="CharacterBody2D"]
-collision_layer = 81
-collision_mask = 11
+collision_layer = 512
+collision_mask = 768
 motion_mode = 1
 script = ExtResource("1_fmkbh")
 
@@ -19,7 +19,7 @@ shape = SubResource("CircleShape2D_1eefc")
 debug_color = Color(1, 1, 1, 0.42)
 
 [node name="pusher" type="StaticBody2D" parent="."]
-collision_layer = 32
+collision_layer = 1024
 collision_mask = 0
 
 [node name="collider" type="CollisionShape2D" parent="pusher"]

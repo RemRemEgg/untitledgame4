@@ -203,7 +203,7 @@ const SDF_FOOTER_3D := """
 	
 	ALBEDO *= clamp(light_level, 0.01, 1.05);
 	ALBEDO = 0.6 * (ALBEDO * ALBEDO + ALBEDO * 2.0);
-	if (hurt) ALBEDO = (vec3(1.0)*0.3 + ALBEDO) / 1.3;
+	if (hurt) ALBEDO = (vec3(1.0)*0.1 + ALBEDO) / 1.2;
 }"""
 
 

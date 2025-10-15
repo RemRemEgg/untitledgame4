@@ -1,7 +1,7 @@
 shader_type canvas_item;
 
 uniform sampler2D screen_texture : hint_screen_texture, repeat_disable, filter_linear;
-const float FOV = 130./180.;
+const float FOV = 135./180.;
 
 void fragment() {
 	//if (UV.x + UV.y < 1.0) {

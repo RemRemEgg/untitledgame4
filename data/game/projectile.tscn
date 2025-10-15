@@ -26,5 +26,4 @@ mesh = SubResource("PlaneMesh_bojni")
 [node name="mesh_instance_3d" type="MeshInstance3D" parent="mesh"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
 top_level = true
-visible = false
 mesh = SubResource("CylinderMesh_t70da")
